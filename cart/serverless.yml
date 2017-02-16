@@ -13,3 +13,8 @@ events:
   - http:
       path: carts
       method: post
+
+resources:
+  Resources:
+    Table:
+      $ref: ./resources/table.json

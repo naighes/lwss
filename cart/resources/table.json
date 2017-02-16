@@ -1,0 +1,21 @@
+{
+    "Type": "AWS::DynamoDB::Table",
+    "Properties": {
+        "TableName": "${self:provider.environment.TABLE_NAME}",
+        "AttributeDefinitions": [{
+            "AttributeName": "cart_id",
+            "AttributeType": "N"
+        }],
+        "KeySchema": [
+            {
+                "AttributeName": "cart_id",
+                "KeyType": "HASH"
+            }
+        ],
+        "ProvisionedThroughput": {
+            "ReadCapacityUnits": 5,
+            "WriteCapacityUnits": 5
+        }
+    }
+}
+
