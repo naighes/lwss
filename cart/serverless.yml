@@ -7,4 +7,9 @@ provider:
 
 functions:
   hello:
-    handler: handler.hello
+    handler: cart.create
+
+events:
+  - http:
+      path: carts
+      method: post
