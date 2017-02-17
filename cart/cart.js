@@ -12,5 +12,3 @@ module.exports.create = (event, context, callback) => {
     callback(null, response);
 };
 
-
-
