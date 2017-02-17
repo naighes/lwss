@@ -4,15 +4,20 @@ provider:
   runtime: nodejs4.3
   stage: dev
   region: us-east-1
+  environment:
+    TABLE_NAME: "cart-${self:provider.stage}"
 
 functions:
-  hello:
+  createCart:
     handler: cart/cart.create
-
-events:
-  - http:
-      path: carts
-      method: post
+    timeout: 10
+    memorySize: 128
+    events:
+      - http:
+          path: carts
+          method: post
+          cors: true
+          private: true
 
 resources:
   Resources:
