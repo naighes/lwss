@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "example app for my speech \"life without servers: Yes We Can!\".",
   "dependencies": {
-    "chai": "^3.5.0"
+    "aws-sdk": "^2.16.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
