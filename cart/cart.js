@@ -30,22 +30,17 @@ const baseUrl = (event) => {
 
 module.exports.create = (event, context, callback) => {
     const db = new AWS.DynamoDB.DocumentClient();
-    fit.perform(() => JSON.parse(event.body))
-        .then((result) => {
-            const id = guid.generate()
-            db.put(putParams(process.env.TABLE_NAME, id), (error, data) => {
-                if (error) {
-                    callback(null, http.reply(500)
-                        .jsonContent({ message: 'oh my...', error: error })
-                        .getResponse())
-                } else {
-                    callback(null, http.reply(201)
-                        .location(`${baseUrl(event)}carts/${id}`)
-                        .getResponse())
-                }
-            })
-        }, (error) => {
-            callback(null, invalidContent())
-        })
+    const id = guid.generate()
+    db.put(putParams(process.env.TABLE_NAME, id), (error, data) => {
+        if (error) {
+            callback(null, http.reply(500)
+                .jsonContent({ message: 'oh my...', error: error })
+                .getResponse())
+        } else {
+            callback(null, http.reply(201)
+                .location(`${baseUrl(event)}carts/${id}`)
+                .getResponse())
+        }
+    })
 };
 

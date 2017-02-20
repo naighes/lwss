@@ -16,15 +16,6 @@ const stubPut = (error, data) => {
 }
 
 describe('creating a cart', () => {
-    it('by invalid content', (done) => {
-        cart.create({
-            body: "{"
-        }, null, (error, result) => {
-            expect(400).to.be.equal(result.statusCode)
-            done()
-        })
-    })
-
     it('when dynamodb raises an error', (done) => {
         stubPut(new Error('what a bug'), { })
         cart.create({
