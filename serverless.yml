@@ -6,6 +6,10 @@ provider:
   region: us-east-1
   environment:
     TABLE_NAME: "cart-${self:provider.stage}"
+  iamRoleStatements:
+    $ref: ./resources/lambda-policy.json
+  apiKeys:
+    - ${self:service}-${self:provider.stage}-api-key
 
 functions:
   createCart:
