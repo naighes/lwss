@@ -25,7 +25,7 @@ const putParams = (table, id) => {
 
 const baseUrl = (event) => {
     const scheme = event.headers['X-Forwarded-Proto']
-    return `${scheme}://${event.headers.host}/${event.requestContext.stage}/`
+    return `${scheme}://${event.headers.Host}/${event.requestContext.stage}/`
 }
 
 module.exports.create = (event, context, callback) => {
