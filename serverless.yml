@@ -28,7 +28,7 @@ functions:
     memorySize: 128
     events:
       - http:
-          path: /carts/{id}/rows/{row_id}
+          path: /carts/{id}/rows/{item_id}
           method: put
           cors: true
           private: true

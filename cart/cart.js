@@ -21,12 +21,12 @@ const paramsForPut = (table, id, now) => {
     };
 }
 
-const paramsForAdd = (table, id, item_id, now, item) => {
+const paramsForAdd = (table, id, itemId, now, item) => {
     return {
         Key: { cart_id: id },
         TableName: table,
         UpdateExpression: 'SET #R.#item_id = :node, last_update = :last_update',
-        ExpressionAttributeNames: { '#item_id' : item_id, '#R': 'rows' },
+        ExpressionAttributeNames: { '#item_id' : itemId, '#R': 'rows' },
         ExpressionAttributeValues: {
             ':last_update': now(),
             ':node' : {
