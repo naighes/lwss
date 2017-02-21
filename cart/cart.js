@@ -9,8 +9,10 @@ const AWS = require('aws-sdk');
 // TODO: handling optimistic concurrency when adding/updating items
 // TODO: adding function for removing item
 // TODO: adding function for deleting cart
+// TODO: [remove] returninf 404 when row does not exists
+// TODO: [delete] returninf 404 when cart does not exists
 
-const paramsForPut = (table, id, now) => {
+const paramsForCreate = (table, id, now) => {
     return {
         TableName : table,
         Item: {
@@ -18,6 +20,13 @@ const paramsForPut = (table, id, now) => {
             last_update: now(),
             rows: { }
         }
+    };
+}
+
+const paramsForDelete = (table, id) => {
+    return {
+        Key: { cart_id: id },
+        TableName : table
     };
 }
 
@@ -78,7 +87,7 @@ const raiseError = (error) => {
 module.exports.create = (event, context, callback) => {
     const db = new AWS.DynamoDB.DocumentClient();
     const id = guid.generate()
-    db.put(paramsForPut(tableName(), id, now), (error, data) => {
+    db.put(paramsForCreate(tableName(), id, now), (error, data) => {
         if (error) {
             raiseError(error).push(callback)
         } else {
@@ -87,6 +96,20 @@ module.exports.create = (event, context, callback) => {
                 .push(callback)
         }
     })
+}
+
+module.exports.delete = (event, context, callback) => {
+    const db = new AWS.DynamoDB.DocumentClient();
+    db.delete(paramsForDelete(tableName(),
+        event.pathParameters.id),
+        (error, data) => {
+            if (error) {
+                raiseError(error).push(callback)
+            } else {
+                http.reply(204)
+                    .push(callback)
+            }
+        })
 }
 
 module.exports.add = (event, context, callback) => {

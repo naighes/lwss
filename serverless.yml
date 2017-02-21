@@ -22,6 +22,16 @@ functions:
           method: post
           cors: true
           private: true
+  deleteCart:
+    handler: cart/cart.delete
+    timeout: 10
+    memorySize: 128
+    events:
+      - http:
+          path: carts/{id}
+          method: delete
+          cors: true
+          private: true
   addRowToCart:
     handler: cart/cart.add
     timeout: 10

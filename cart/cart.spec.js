@@ -29,6 +29,10 @@ const stubGet = (error, data) => {
     stubDynamo('get')(error, data)
 }
 
+const stubDelete = (error, data) => {
+    stubDynamo('delete')(error, data)
+}
+
 describe('creating a cart', () => {
     it('when dynamodb raises an error', (done) => {
         stubPut(new Error('what a bug'), { })
@@ -58,6 +62,32 @@ describe('creating a cart', () => {
         }, null, (error, result) => {
             expect(201).to.be.equal(result.statusCode)
             expect('http://fak.eurl/dev/carts/2').to.be.equal(result.headers.Location)
+            done()
+        })
+    })
+})
+
+describe('deleting a cart', () => {
+    it('when dynamodb raises an error', (done) => {
+        stubDelete(new Error('what a bug'), { })
+        cart.delete({
+            pathParameters: {
+                id: '2'
+            }
+        }, null, (error, result) => {
+            expect(500).to.be.equal(result.statusCode)
+            done()
+        })
+    })
+
+    it('happy path', (done) => {
+        stubDelete(null, { })
+        cart.delete({
+            pathParameters: {
+                id: '2'
+            }
+        }, null, (error, result) => {
+            expect(204).to.be.equal(result.statusCode)
             done()
         })
     })
