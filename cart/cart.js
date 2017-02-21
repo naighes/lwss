@@ -13,13 +13,14 @@ const invalidContent = () => {
         .getResponse()
 }
 
-const addParams = (table, id, item_id, item) => {
+const addParams = (table, id, item_id, now, item) => {
     return {
         Key: { cart_id: id },
         TableName: table,
-        UpdateExpression: 'SET #R.#item_id = :node',
+        UpdateExpression: 'SET #R.#item_id = :node, last_update = :last_update',
         ExpressionAttributeNames: { '#item_id' : item_id, '#R': 'rows' },
         ExpressionAttributeValues: {
+            ':last_update': now(),
             ':node' : {
                 description: item.description,
                 price: item.price,
@@ -29,11 +30,12 @@ const addParams = (table, id, item_id, item) => {
     }
 }
 
-const putParams = (table, id) => {
+const putParams = (table, id, now) => {
     return {
         TableName : table,
         Item: {
             cart_id: id,
+            last_update: now(),
             rows: { }
         }
     };
@@ -44,10 +46,18 @@ const baseUrl = (event) => {
     return `${scheme}://${event.headers.Host}/${event.requestContext.stage}/`
 }
 
+const now = () => {
+    return new Date().getTime()
+}
+
+const tableName = () => {
+    return process.env.TABLE_NAME
+}
+
 module.exports.create = (event, context, callback) => {
     const db = new AWS.DynamoDB.DocumentClient();
     const id = guid.generate()
-    db.put(putParams(process.env.TABLE_NAME, id), (error, data) => {
+    db.put(putParams(tableName(), id, now), (error, data) => {
         if (error) {
             callback(null, http.reply(500)
                 .jsonContent({ message: 'oh my...', error: error })
@@ -63,9 +73,10 @@ module.exports.create = (event, context, callback) => {
 module.exports.add = (event, context, callback) => {
     const db = new AWS.DynamoDB.DocumentClient();
     const body = JSON.parse(event.body)
-    db.update(addParams(process.env.TABLE_NAME,
+    db.update(addParams(tableName(),
         event.pathParameters.id,
         event.pathParameters.item_id,
+        now,
         body), (error, data) => {
             if (error) {
                 callback(null, http.reply(500)
