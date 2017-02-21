@@ -93,6 +93,34 @@ describe('adding an item', () => {
     })
 })
 
+describe('removing an item', () => {
+    it('when dynamodb raises an error', (done) => {
+        stubUpdate(new Error('what a bug'), { })
+        cart.remove({
+            pathParameters: {
+                id: '123-456',
+                item_id: '789'
+            }
+        }, null, (error, result) => {
+            expect(500).to.be.equal(result.statusCode)
+            done()
+        })
+    })
+
+    it('happy path', (done) => {
+        stubUpdate(null, { })
+        cart.remove({
+            pathParameters: {
+                id: '123-456',
+                item_id: '789'
+            }
+        }, null, (error, result) => {
+            expect(204).to.be.equal(result.statusCode)
+            done()
+        })
+    })
+})
+
 describe('retrieving a cart', () => {
     it('when dynamodb raises an error', (done) => {
         stubGet(new Error('what a bug'), { })

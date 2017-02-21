@@ -38,6 +38,18 @@ const paramsForAdd = (table, id, itemId, now, item) => {
     }
 }
 
+const paramsForRemove = (table, id, itemId, now) => {
+    return {
+        Key: { cart_id: id },
+        TableName: table,
+        UpdateExpression: 'REMOVE #R.#item_id SET last_update = :last_update',
+        ExpressionAttributeNames: { '#item_id' : itemId, '#R': 'rows' },
+        ExpressionAttributeValues: {
+            ':last_update': now()
+        }
+    }
+}
+
 const paramsForGet = (table, id) => {
     return {
         TableName: table,
@@ -86,6 +98,21 @@ module.exports.add = (event, context, callback) => {
         event.pathParameters.item_id,
         now,
         body), (error, data) => {
+            if (error) {
+                raiseError(error).push(callback)
+            } else {
+                http.reply(204)
+                    .push(callback)
+            }
+        })
+}
+
+module.exports.remove = (event, context, callback) => {
+    const db = new AWS.DynamoDB.DocumentClient();
+    db.update(paramsForRemove(tableName(),
+        event.pathParameters.id,
+        event.pathParameters.item_id,
+        now), (error, data) => {
             if (error) {
                 raiseError(error).push(callback)
             } else {
