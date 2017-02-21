@@ -120,14 +120,15 @@ describe('retrieving a cart', () => {
 
     it('happy path', (done) => {
         stubGet(null, {
-            last_update: 1476949794,
-            rows: {
-                '23': {
-                    description: 'cool shoes',
-                    price: 34.2
+            Item: {
+                last_update: 1476949794,
+                rows: {
+                    '23': {
+                        description: 'cool shoes',
+                        price: 34.2
+                    }
                 }
-            }
-        })
+            }})
         cart.get({
             pathParameters: {
                 id: '123-456'

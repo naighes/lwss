@@ -103,9 +103,9 @@ module.exports.get = (event, context, callback) => {
                 .push(callback)
         } else {
             http.reply(200)
-                .lastModified(new Date(data.last_update))
+                .lastModified(new Date(data.Item.last_update))
                 .jsonContent({
-                    rows: data.rows
+                    rows: data.Item.rows
                 })
                 .push(callback)
         }
