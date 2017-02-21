@@ -117,5 +117,29 @@ describe('retrieving a cart', () => {
             done()
         })
     })
+
+    it('happy path', (done) => {
+        stubGet(null, {
+            last_update: 1476949794,
+            rows: {
+                '23': {
+                    description: 'cool shoes',
+                    price: 34.2
+                }
+            }
+        })
+        cart.get({
+            pathParameters: {
+                id: '123-456'
+            }
+        }, null, (error, result) => {
+            expect(200).to.be.equal(result.statusCode)
+            expect('1970-01-18T02:15:49.794Z').to.be.equal(result.headers['Last-Modified'])
+            const row = JSON.parse(result.body).rows['23']
+            expect('cool shoes').to.be.equal(row.description)
+            expect(34.2).to.be.equal(row.price)
+            done()
+        })
+    })
 })
 

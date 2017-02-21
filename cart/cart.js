@@ -99,15 +99,19 @@ module.exports.add = (event, context, callback) => {
 module.exports.get = (event, context, callback) => {
     const db = new AWS.DynamoDB.DocumentClient();
     const handleResult = (data) => {
-        if (Object.keys(data) === 0) {
-            callback(null, http.reply(200)
-                .jsonContent(data)
+        if (Object.keys(data).length === 0) {
+            callback(null, http.reply(404)
                 .getResponse())
         } else {
-            callback(null, http.reply(404)
+            callback(null, http.reply(200)
+                .lastModified(new Date(data.last_update))
+                .jsonContent({
+                    rows: data.rows
+                })
                 .getResponse())
         }
     }
+
     db.get(paramsForGet(tableName(),
         event.pathParameters.id), (error, data) => {
             if (error) {
