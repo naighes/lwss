@@ -22,6 +22,16 @@ functions:
           method: post
           cors: true
           private: true
+  addRowToCart:
+    handler: cart/cart.add
+    timeout: 10
+    memorySize: 128
+    events:
+      - http:
+          path: /carts/{id}/rows/{row_id}
+          method: put
+          cors: true
+          private: true
 
 resources:
   Resources:

@@ -13,12 +13,28 @@ const invalidContent = () => {
         .getResponse()
 }
 
+const addParams = (table, id, item_id, item) => {
+    return {
+        Key: { cart_id: id },
+        TableName: table,
+        UpdateExpression: 'SET #R.#item_id = :node',
+        ExpressionAttributeNames: { '#item_id' : item_id, '#R': 'rows' },
+        ExpressionAttributeValues: {
+            ':node' : {
+                description: item.description,
+                price: item.price,
+                quantity: item.quantity
+            }
+        }
+    }
+}
+
 const putParams = (table, id) => {
     return {
         TableName : table,
         Item: {
             cart_id: id,
-            rows: []
+            rows: { }
         }
     };
 }
@@ -42,5 +58,23 @@ module.exports.create = (event, context, callback) => {
                 .getResponse())
         }
     })
-};
+}
+
+module.exports.add = (event, context, callback) => {
+    const db = new AWS.DynamoDB.DocumentClient();
+    const body = JSON.parse(event.body)
+    db.update(addParams(process.env.TABLE_NAME,
+        event.pathParameters.id,
+        event.pathParameters.item_id,
+        body), (error, data) => {
+            if (error) {
+                callback(null, http.reply(500)
+                    .jsonContent({ message: 'oh my...', error: error })
+                    .getResponse())
+            } else {
+                callback(null, http.reply(204)
+                    .getResponse())
+            }
+        })
+}
 
