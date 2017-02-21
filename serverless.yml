@@ -5,7 +5,8 @@ provider:
   stage: dev
   region: us-east-1
   environment:
-    TABLE_NAME: "cart-${self:provider.stage}"
+    CART_TABLE_NAME: "cart-${self:provider.stage}"
+    ORDER_TABLE_NAME: "order-${self:provider.stage}"
   iamRoleStatements:
     $ref: ./resources/lambda-policy.json
   apiKeys:
@@ -65,5 +66,7 @@ functions:
 
 resources:
   Resources:
-    Table:
-      $ref: ./resources/table.json
+    Cart:
+      $ref: ./resources/cart_table.json
+    Order:
+      $ref: ./resources/order_table.json

@@ -10,13 +10,25 @@
         "Action": [
             "dynamodb:*"
         ],
-        "Resource": "arn:aws:dynamodb:*:*:table/${self:provider.environment.TABLE_NAME}"
+        "Resource": "arn:aws:dynamodb:*:*:table/${self:provider.environment.CART_TABLE_NAME}"
     }, {
         "Effect": "Allow",
         "Action": [
             "dynamodb:*"
         ],
-        "Resource": "arn:aws:dynamodb:*:*:table/${self:provider.environment.TABLE_NAME*/stream/*}"
+        "Resource": "arn:aws:dynamodb:*:*:table/${self:provider.environment.CART_TABLE_NAME*/stream/*}"
+    }, {
+        "Effect": "Allow",
+        "Action": [
+            "dynamodb:*"
+        ],
+        "Resource": "arn:aws:dynamodb:*:*:table/${self:provider.environment.ORDER_TABLE_NAME}"
+    }, {
+        "Effect": "Allow",
+        "Action": [
+            "dynamodb:*"
+        ],
+        "Resource": "arn:aws:dynamodb:*:*:table/${self:provider.environment.ORDER_TABLE_NAME*/stream/*}"
     },
     {
         "Effect": "Allow",

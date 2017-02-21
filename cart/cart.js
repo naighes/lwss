@@ -1,6 +1,5 @@
 'use strict';
 
-const fit = require('../lib/fluent-fit')
 const http = require('../lib/http')
 const guid = require('../lib/guid')
 const AWS = require('aws-sdk');
@@ -76,7 +75,7 @@ const now = () => {
 }
 
 const tableName = () => {
-    return process.env.TABLE_NAME
+    return process.env.CART_TABLE_NAME
 }
 
 const raiseError = (error) => {

@@ -1,7 +1,7 @@
 {
     "Type": "AWS::DynamoDB::Table",
     "Properties": {
-        "TableName": "${self:provider.environment.TABLE_NAME}",
+        "TableName": "${self:provider.environment.CART_TABLE_NAME}",
         "AttributeDefinitions": [{
             "AttributeName": "cart_id",
             "AttributeType": "S"
