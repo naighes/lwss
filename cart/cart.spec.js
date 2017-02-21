@@ -6,22 +6,27 @@ const cart = require('./cart')
 const guid = require('../lib/guid')
 const AWS = require('aws-sdk-mock');
 
+const stubDynamo = (method) => {
+    return (error, data) => {
+        AWS.mock('DynamoDB.DocumentClient',
+            method,
+            (params, callback) => {
+                callback(error, data)
+                AWS.restore('DynamoDB.DocumentClient');
+            })
+    }
+}
+
 const stubPut = (error, data) => {
-    AWS.mock('DynamoDB.DocumentClient',
-        'put',
-        (params, callback) => {
-            callback(error, data)
-            AWS.restore('DynamoDB.DocumentClient');
-        })
+    stubDynamo('put')(error, data)
 }
 
 const stubUpdate = (error, data) => {
-    AWS.mock('DynamoDB.DocumentClient',
-        'update',
-        (params, callback) => {
-            callback(error, data)
-            AWS.restore('DynamoDB.DocumentClient');
-        })
+    stubDynamo('update')(error, data)
+}
+
+const stubGet = (error, data) => {
+    stubDynamo('get')(error, data)
 }
 
 describe('creating a cart', () => {
@@ -58,7 +63,7 @@ describe('creating a cart', () => {
     })
 })
 
-describe('adding anitem', () => {
+describe('adding an item', () => {
     it('when dynamodb raises an error', (done) => {
         stubUpdate(new Error('what a bug'), { })
         cart.add({
@@ -83,6 +88,32 @@ describe('adding anitem', () => {
             body: "{ }"
         }, null, (error, result) => {
             expect(204).to.be.equal(result.statusCode)
+            done()
+        })
+    })
+})
+
+describe('retrieving a cart', () => {
+    it('when dynamodb raises an error', (done) => {
+        stubGet(new Error('what a bug'), { })
+        cart.get({
+            pathParameters: {
+                id: '123-456'
+            }
+        }, null, (error, result) => {
+            expect(500).to.be.equal(result.statusCode)
+            done()
+        })
+    })
+
+    it('when dynamodb returns empty', (done) => {
+        stubGet(null, { })
+        cart.get({
+            pathParameters: {
+                id: '123-456'
+            }
+        }, null, (error, result) => {
+            expect(404).to.be.equal(result.statusCode)
             done()
         })
     })

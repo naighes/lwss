@@ -13,7 +13,18 @@ const invalidContent = () => {
         .getResponse()
 }
 
-const addParams = (table, id, item_id, now, item) => {
+const paramsForPut = (table, id, now) => {
+    return {
+        TableName : table,
+        Item: {
+            cart_id: id,
+            last_update: now(),
+            rows: { }
+        }
+    };
+}
+
+const paramsForAdd = (table, id, item_id, now, item) => {
     return {
         Key: { cart_id: id },
         TableName: table,
@@ -30,15 +41,11 @@ const addParams = (table, id, item_id, now, item) => {
     }
 }
 
-const putParams = (table, id, now) => {
+const paramsForGet = (table, id) => {
     return {
-        TableName : table,
-        Item: {
-            cart_id: id,
-            last_update: now(),
-            rows: { }
-        }
-    };
+        TableName: table,
+        Key: { cart_id: id }
+    }
 }
 
 const baseUrl = (event) => {
@@ -57,7 +64,7 @@ const tableName = () => {
 module.exports.create = (event, context, callback) => {
     const db = new AWS.DynamoDB.DocumentClient();
     const id = guid.generate()
-    db.put(putParams(tableName(), id, now), (error, data) => {
+    db.put(paramsForPut(tableName(), id, now), (error, data) => {
         if (error) {
             callback(null, http.reply(500)
                 .jsonContent({ message: 'oh my...', error: error })
@@ -73,7 +80,7 @@ module.exports.create = (event, context, callback) => {
 module.exports.add = (event, context, callback) => {
     const db = new AWS.DynamoDB.DocumentClient();
     const body = JSON.parse(event.body)
-    db.update(addParams(tableName(),
+    db.update(paramsForAdd(tableName(),
         event.pathParameters.id,
         event.pathParameters.item_id,
         now,
@@ -85,6 +92,30 @@ module.exports.add = (event, context, callback) => {
             } else {
                 callback(null, http.reply(204)
                     .getResponse())
+            }
+        })
+}
+
+module.exports.get = (event, context, callback) => {
+    const db = new AWS.DynamoDB.DocumentClient();
+    const handleResult = (data) => {
+        if (Object.keys(data) === 0) {
+            callback(null, http.reply(200)
+                .jsonContent(data)
+                .getResponse())
+        } else {
+            callback(null, http.reply(404)
+                .getResponse())
+        }
+    }
+    db.get(paramsForGet(tableName(),
+        event.pathParameters.id), (error, data) => {
+            if (error) {
+                callback(null, http.reply(500)
+                    .jsonContent({ message: 'oh my...', error: error })
+                    .getResponse())
+            } else {
+                handleResult(data)
             }
         })
 }

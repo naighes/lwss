@@ -32,6 +32,16 @@ functions:
           method: put
           cors: true
           private: true
+  getCart:
+    handler: cart/cart.get
+    timeout: 10
+    memorySize: 128
+    events:
+      - http:
+          path: /carts/{id}
+          method: get
+          cors: true
+          private: true
 
 resources:
   Resources:
