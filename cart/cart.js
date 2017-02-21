@@ -5,13 +5,10 @@ const http = require('../lib/http')
 const guid = require('../lib/guid')
 const AWS = require('aws-sdk');
 
-const invalidContent = () => {
-    return http.reply(400)
-        .jsonContent({
-            message: 'it looks like you sent invalid content for application/json media type'
-        })
-        .getResponse()
-}
+// TODO: providing support for conditional requests
+// TODO: handling optimistic concurrency when adding/updating items
+// TODO: adding function for removing item
+// TODO: adding function for deleting cart
 
 const paramsForPut = (table, id, now) => {
     return {
@@ -61,24 +58,28 @@ const tableName = () => {
     return process.env.TABLE_NAME
 }
 
+const raiseError = (error) => {
+    return http.reply(500)
+        .jsonContent({ message: 'oh my...', error: error })
+}
+
 module.exports.create = (event, context, callback) => {
     const db = new AWS.DynamoDB.DocumentClient();
     const id = guid.generate()
     db.put(paramsForPut(tableName(), id, now), (error, data) => {
         if (error) {
-            callback(null, http.reply(500)
-                .jsonContent({ message: 'oh my...', error: error })
-                .getResponse())
+            raiseError(error).push(callback)
         } else {
-            callback(null, http.reply(201)
+            http.reply(201)
                 .location(`${baseUrl(event)}carts/${id}`)
-                .getResponse())
+                .push(callback)
         }
     })
 }
 
 module.exports.add = (event, context, callback) => {
     const db = new AWS.DynamoDB.DocumentClient();
+    // TODO: ensure body
     const body = JSON.parse(event.body)
     db.update(paramsForAdd(tableName(),
         event.pathParameters.id,
@@ -86,12 +87,10 @@ module.exports.add = (event, context, callback) => {
         now,
         body), (error, data) => {
             if (error) {
-                callback(null, http.reply(500)
-                    .jsonContent({ message: 'oh my...', error: error })
-                    .getResponse())
+                raiseError(error).push(callback)
             } else {
-                callback(null, http.reply(204)
-                    .getResponse())
+                http.reply(204)
+                    .push(callback)
             }
         })
 }
@@ -100,24 +99,22 @@ module.exports.get = (event, context, callback) => {
     const db = new AWS.DynamoDB.DocumentClient();
     const handleResult = (data) => {
         if (Object.keys(data).length === 0) {
-            callback(null, http.reply(404)
-                .getResponse())
+            http.reply(404)
+                .push(callback)
         } else {
-            callback(null, http.reply(200)
+            http.reply(200)
                 .lastModified(new Date(data.last_update))
                 .jsonContent({
                     rows: data.rows
                 })
-                .getResponse())
+                .push(callback)
         }
     }
 
     db.get(paramsForGet(tableName(),
         event.pathParameters.id), (error, data) => {
             if (error) {
-                callback(null, http.reply(500)
-                    .jsonContent({ message: 'oh my...', error: error })
-                    .getResponse())
+                raiseError(error).push(callback)
             } else {
                 handleResult(data)
             }
