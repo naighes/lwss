@@ -83,6 +83,15 @@ const raiseError = (error) => {
         .jsonContent({ message: 'oh my...', error: error })
 }
 
+const parseBody = (body, onSuccess, onError) => {
+    try {
+        const json = JSON.parse(body)
+        return onSuccess(json)
+    } catch (e) {
+        onError(e)
+    }
+}
+
 module.exports.create = (event, context, callback) => {
     const db = new AWS.DynamoDB.DocumentClient();
     const id = guid.generate()
@@ -113,20 +122,22 @@ module.exports.delete = (event, context, callback) => {
 
 module.exports.add = (event, context, callback) => {
     const db = new AWS.DynamoDB.DocumentClient();
-    // TODO: ensure body
-    const body = JSON.parse(event.body)
-    db.update(paramsForAdd(tableName(),
-        event.pathParameters.id,
-        event.pathParameters.item_id,
-        now,
-        body), (error, data) => {
-            if (error) {
-                raiseError(error).push(callback)
-            } else {
-                http.reply(204)
-                    .push(callback)
-            }
-        })
+    parseBody(event.body,
+        (content) => {
+            db.update(paramsForAdd(tableName(),
+                event.pathParameters.id,
+                event.pathParameters.item_id,
+                now,
+                content), (error, data) => {
+                    if (error) {
+                        raiseError(error).push(callback)
+                    } else {
+                        http.reply(204)
+                            .push(callback)
+                    }
+                })
+        },
+        (error) => { http.reply(400).push(callback) })
 }
 
 module.exports.remove = (event, context, callback) => {

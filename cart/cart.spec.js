@@ -108,6 +108,19 @@ describe('adding an item', () => {
         })
     })
 
+    it('when content is invalid', (done) => {
+        cart.add({
+            pathParameters: {
+                id: '123-456',
+                item_id: '789'
+            },
+            body: "{"
+        }, null, (error, result) => {
+            expect(400).to.be.equal(result.statusCode)
+            done()
+        })
+    })
+
     it('happy path', (done) => {
         stubUpdate(null, { })
         cart.add({

@@ -39,7 +39,7 @@ functions:
     memorySize: 128
     events:
       - http:
-          path: /carts/{id}/rows/{item_id}
+          path: carts/{id}/rows/{item_id}
           method: put
           cors: true
           private: true
@@ -49,7 +49,7 @@ functions:
     memorySize: 128
     events:
       - http:
-          path: /carts/{id}/rows/{item_id}
+          path: carts/{id}/rows/{item_id}
           method: delete
           cors: true
           private: true
@@ -59,8 +59,18 @@ functions:
     memorySize: 128
     events:
       - http:
-          path: /carts/{id}
+          path: carts/{id}
           method: get
+          cors: true
+          private: true
+  createOrder:
+    handler: cart/order.create
+    timeout: 10
+    memorySize: 128
+    events:
+      - http:
+          path: orders
+          method: post
           cors: true
           private: true
 
