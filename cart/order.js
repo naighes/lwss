@@ -3,8 +3,7 @@
 const http = require('../lib/http')
 const guid = require('../lib/guid')
 const AWS = require('aws-sdk');
-
-// TODO: adding validation for order creation
+const Validator = require('jsonschema').Validator;
 
 const paramsForCreate = (table, id, content, now) => {
     return {
@@ -38,18 +37,58 @@ const raiseError = (error) => {
 const parseBody = (body, onSuccess, onError) => {
     try {
         const json = JSON.parse(body)
-        return onSuccess(json)
+        onSuccess(json)
     } catch (e) {
         onError(e)
+    }
+}
+
+const validateOrder = (content, onSuccess, onError) => {
+    var schema = {
+        "type": "object",
+        "properties": {
+            "cart": {
+                "type": "object",
+                "required": true,
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "required": true
+                    },
+                    "rows": {
+                        "type": "object",
+                        "required": true,
+                        "minProperties": 1
+                    },
+                    "email": {
+                        "type": "string",
+                        "required": true
+                    }
+                }
+            }
+        }
+    };
+    var v = new Validator();
+    var result = v.validate(content, schema)
+
+    if (result.errors.length > 0) {
+        onError(result.errors.map((value) => {
+            return {
+                property: value.property,
+                message: value.message
+            }
+        }))
+    } else {
+        onSuccess(content)
     }
 }
 
 module.exports.create = (event, context, callback) => {
     const db = new AWS.DynamoDB.DocumentClient();
     const id = guid.generate()
-    parseBody(event.body,
-        (content) => {
-            db.put(paramsForCreate(tableName(), id, content, now), (error, data) => {
+    const raisePut = (content) => {
+        db.put(paramsForCreate(tableName(), id, content, now),
+            (error, data) => {
                 if (error) {
                     raiseError(error).push(callback)
                 } else {
@@ -58,7 +97,18 @@ module.exports.create = (event, context, callback) => {
                         .push(callback)
                 }
             })
-        },
+    }
+    const validate = (content) => {
+        validateOrder(content,
+            raisePut,
+            (errors) => {
+                http.reply(422)
+                    .jsonContent(errors)
+                    .push(callback)
+            })
+    }
+    parseBody(event.body,
+        validate,
         (error) => { http.reply(400).push(callback) })
 }
 

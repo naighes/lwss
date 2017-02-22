@@ -25,11 +25,22 @@ const stubGet = (error, data) => {
     stubDynamo('get')(error, data)
 }
 
+const validBody = {
+    cart: {
+        id: "1",
+        email: "mario@rossi.lcl",
+        rows: {
+            '22': {
+            }
+        }
+    }
+}
+
 describe('creating an order', () => {
     it('when dynamodb raises an error', (done) => {
         stubPut(new Error('what a bug'), { })
         order.create({
-            body: "{}"
+            body: JSON.stringify(validBody)
         }, null, (error, result) => {
             expect(500).to.be.equal(result.statusCode)
             done()
@@ -41,6 +52,16 @@ describe('creating an order', () => {
             body: "{"
         }, null, (error, result) => {
             expect(400).to.be.equal(result.statusCode)
+            done()
+        })
+    })
+
+    it('when validation fails', (done) => {
+        order.create({
+            body: "{}"
+        }, null, (error, result) => {
+            expect(422).to.be.equal(result.statusCode)
+            console.log(result.body)
             done()
         })
     })
@@ -59,7 +80,7 @@ describe('creating an order', () => {
             requestContext: {
                 stage: 'dev'
             },
-            body: "{}"
+            body: JSON.stringify(validBody)
         }, null, (error, result) => {
             expect(201).to.be.equal(result.statusCode)
             expect('http://fak.eurl/dev/orders/2').to.be.equal(result.headers.Location)

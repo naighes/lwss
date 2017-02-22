@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "example app for my speech \"life without servers: Yes We Can!\".",
   "dependencies": {
-    "aws-sdk": "^2.16.0"
+    "aws-sdk": "^2.16.0",
+    "jsonschema": "^1.1.1"
   },
   "devDependencies": {
     "aws-sdk-mock": "^1.6.1",

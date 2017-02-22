@@ -4,13 +4,6 @@ const http = require('../lib/http')
 const guid = require('../lib/guid')
 const AWS = require('aws-sdk');
 
-// TODO: providing support for conditional requests
-// TODO: handling optimistic concurrency when adding/updating items
-// TODO: adding function for removing item
-// TODO: adding function for deleting cart
-// TODO: [remove] returninf 404 when row does not exists
-// TODO: [delete] returninf 404 when cart does not exists
-
 const paramsForCreate = (table, id, now) => {
     return {
         TableName : table,
