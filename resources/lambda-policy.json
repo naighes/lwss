@@ -24,5 +24,12 @@
             "lambda:*"
         ],
         "Resource": "*"
+    },
+    {
+        "Effect": "Allow",
+        "Action": [
+            "sns:*"
+        ],
+        "Resource": "*"
     }
 ]

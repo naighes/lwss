@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "example app for my speech \"life without servers: Yes We Can!\".",
   "dependencies": {
+    "async": "^2.1.5",
     "aws-sdk": "^2.16.0",
+    "dynamodb-data-types": "^3.0.0",
     "jsonschema": "^1.1.1"
   },
   "devDependencies": {

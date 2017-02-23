@@ -7,6 +7,8 @@ provider:
   environment:
     CART_TABLE_NAME: "cart-${self:provider.stage}"
     ORDER_TABLE_NAME: "order-${self:provider.stage}"
+    ORDER_TOPIC: "orders-${self:provider.stage}"
+    ORDER_TOPIC_ARN: { "Fn::Join" : ["", ["arn:aws:sns:${self:provider.region}:", { "Ref" : "AWS::AccountId" }, ":${self:provider.environment.ORDER_TOPIC}" ] ]  }
   iamRoleStatements:
     $ref: ./resources/lambda-policy.json
   apiKeys:
@@ -73,10 +75,22 @@ functions:
           method: post
           cors: true
           private: true
+  incomingOrder:
+    handler: listener/incoming.order
+    timeout: 30
+    memorySize: 128
+  sendEmail:
+    handler: listener/consumer.newOrder
+    timeout: 30
+    memorySize: 128
+    events:
+      - sns: ${self:provider.environment.ORDER_TOPIC}
 
 resources:
   Resources:
-    Cart:
+    CartTable:
       $ref: ./resources/cart_table.json
-    Order:
+    OrderTable:
       $ref: ./resources/order_table.json
+    OrderEvent:
+      $ref: ./resources/order_event_source_mapping.yml

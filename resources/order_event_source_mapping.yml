@@ -1,0 +1,12 @@
+Type: AWS::Lambda::EventSourceMapping
+Properties:
+  BatchSize: 10
+  EventSourceArn:
+    Fn::GetAtt:
+      - OrderTable
+      - StreamArn
+  FunctionName:
+    Fn::GetAtt:
+      - IncomingOrderLambdaFunction
+      - Arn
+  StartingPosition: TRIM_HORIZON
