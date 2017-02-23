@@ -79,7 +79,7 @@ const raiseError = (error) => {
 const parseBody = (body, onSuccess, onError) => {
     try {
         const json = JSON.parse(body)
-        return onSuccess(json)
+        onSuccess(json)
     } catch (e) {
         onError(e)
     }
