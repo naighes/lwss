@@ -87,6 +87,7 @@ functions:
     timeout: 30
     environment:
       SENDGRID_API_KEY: "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"
+      SENDER_EMAIL: "noreply@lif-ewithou-tservers.com"
     memorySize: 128
     events:
       - sns: ${self:custom.ORDER_TOPIC}

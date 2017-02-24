@@ -38,7 +38,7 @@ const send = (message, callback) => {
                 to: [{ email: message.cart.email }],
                 subject: 'here\'s your order'
             }],
-            from: { email: 'noreply@lif-ewithou-tservers.com' },
+            from: { email: process.env.SENDER_EMAIL },
             content: [{
                 type: 'text/html',
                 value: emailBody(message.cart) }],
