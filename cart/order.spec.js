@@ -35,6 +35,15 @@ const validBody = {
 }
 
 describe('creating an order', () => {
+    var sandbox;
+    beforeEach(function () {
+        sandbox = sinon.sandbox.create();
+    });
+
+    afterEach(function () {
+        sandbox.restore();
+    });
+
     it('when dynamodb raises an error', (done) => {
         stubPut(new Error('what a bug'), { })
         order.create({
@@ -65,7 +74,7 @@ describe('creating an order', () => {
 
     it('happy path', (done) => {
         const orderId = '2'
-        sinon.stub(guid, 'generate', () => {
+        sandbox.stub(guid, 'generate', () => {
             return orderId
         });
         stubPut(null, { })

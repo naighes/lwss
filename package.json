@@ -12,7 +12,11 @@
   "devDependencies": {
     "aws-sdk-mock": "^1.6.1",
     "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-jshint": "^2.0.4",
+    "gulp-mocha": "^4.0.1",
     "mocha": "^3.2.0",
+    "run-sequence": "^1.2.2",
     "sinon": "^1.17.7"
   },
   "scripts": {

@@ -34,6 +34,15 @@ const stubDelete = (error, data) => {
 }
 
 describe('creating a cart', () => {
+    var sandbox;
+    beforeEach(function () {
+        sandbox = sinon.sandbox.create();
+    });
+
+    afterEach(function () {
+        sandbox.restore();
+    });
+
     it('when dynamodb raises an error', (done) => {
         stubPut(new Error('what a bug'), { })
         cart.create({
@@ -46,7 +55,7 @@ describe('creating a cart', () => {
 
     it('happy path', (done) => {
         const cartId = '2'
-        sinon.stub(guid, 'generate', () => {
+        sandbox.stub(guid, 'generate', () => {
             return cartId
         });
         stubPut(null, { })
