@@ -9,7 +9,17 @@ describe('consuming order created', () => {
     it('one SNS message', (done) => {
         const message = JSON.stringify({
             cart: {
-                email: 'mar@iorossi.lcl'
+                email: 'mar@iorossi.lcl',
+                rows: {
+                    '1': {
+                        description: 'red wine',
+                        price: 12.3
+                    },
+                    '2': {
+                        description: 'blond beer',
+                        price: 5.2
+                    }
+                }
             }
         })
         sinon.stub(sendgrid, 'emptyRequest', (descriptor) => {
