@@ -5,12 +5,12 @@ const guid = require('../lib/guid')
 const AWS = require('aws-sdk');
 const Validator = require('jsonschema').Validator;
 
-const paramsForCreate = (table, id, content, now) => {
+const paramsForCreate = (table, id, cart, now) => {
     return {
         TableName : table,
         Item: {
             order_id: id,
-            content: content,
+            cart: cart,
             last_update: now()
         }
     };
@@ -47,27 +47,22 @@ const validateOrder = (content, onSuccess, onError) => {
     var schema = {
         "type": "object",
         "properties": {
-            "cart": {
+            "cart_id": {
+                "type": "string",
+                "required": true
+            },
+            "rows": {
                 "type": "object",
                 "required": true,
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "required": true
-                    },
-                    "rows": {
-                        "type": "object",
-                        "required": true,
-                        "minProperties": 1
-                    },
-                    "email": {
-                        "type": "string",
-                        "required": true
-                    }
-                }
+                "minProperties": 1
+            },
+            "email": {
+                "type": "string",
+                "required": true
             }
         }
-    };
+    }
+
     var v = new Validator();
     var result = v.validate(content, schema)
 

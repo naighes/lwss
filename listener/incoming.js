@@ -4,7 +4,7 @@ const AWS = require('aws-sdk');
 const attr = require('dynamodb-data-types').AttributeValue
 const async = require('async')
 
-const handler = (record, callback) => {
+const withRecord = (record, callback) => {
     const sns = new AWS.SNS()
     sns.publish(getParams(record, topicArn()),
         (error, data) => {
@@ -24,9 +24,7 @@ const getParams = (record, topicArn) => {
     const image = attr.unwrap(record.dynamodb.NewImage)
 
     return {
-        Message: JSON.stringify({
-            cart: image
-        }),
+        Message: JSON.stringify(image),
         MessageAttributes: {
             message_id: {
                 DataType: "String",
@@ -52,7 +50,7 @@ module.exports.order = (event, context, callback) => {
     }
 
     async.eachSeries(event.Records || [],
-        handler,
+        withRecord,
         handleResult)
 }
 

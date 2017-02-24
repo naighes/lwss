@@ -26,12 +26,10 @@ const stubGet = (error, data) => {
 }
 
 const validBody = {
-    cart: {
-        id: "1",
-        email: "mario@rossi.lcl",
-        rows: {
-            '22': {
-            }
+    cart_id: "1",
+    email: "mario@rossi.lcl",
+    rows: {
+        '22': {
         }
     }
 }
@@ -61,7 +59,6 @@ describe('creating an order', () => {
             body: "{}"
         }, null, (error, result) => {
             expect(422).to.be.equal(result.statusCode)
-            console.log(result.body)
             done()
         })
     })

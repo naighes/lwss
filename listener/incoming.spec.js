@@ -15,7 +15,7 @@ const stubPublish = (error, data) => {
         })
 }
 
-describe('creating an order', () => {
+describe('stream is triggered', () => {
     it('when no records', (done) => {
         incoming.order({
             Records: []
@@ -25,7 +25,7 @@ describe('creating an order', () => {
         })
     })
 
-    it('one record with no errors', (done) => {
+    it('when one record with no errors', (done) => {
         sinon.stub(attr.AttributeValue, 'unwrap', (image) => {
             return {
                 id: '1'

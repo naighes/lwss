@@ -1,4 +1,8 @@
 service: cart
+
+custom:
+  ORDER_TOPIC: "orders-${self:provider.stage}"
+
 provider:
   name: aws
   runtime: nodejs4.3
@@ -7,8 +11,7 @@ provider:
   environment:
     CART_TABLE_NAME: "cart-${self:provider.stage}"
     ORDER_TABLE_NAME: "order-${self:provider.stage}"
-    ORDER_TOPIC: "orders-${self:provider.stage}"
-    ORDER_TOPIC_ARN: { "Fn::Join" : ["", ["arn:aws:sns:${self:provider.region}:", { "Ref" : "AWS::AccountId" }, ":${self:provider.environment.ORDER_TOPIC}" ] ]  }
+    ORDER_TOPIC_ARN: { "Fn::Join" : ["", ["arn:aws:sns:", { "Ref" : "AWS::Region"}, ":", { "Ref" : "AWS::AccountId" }, ":${self:custom.ORDER_TOPIC}"]]  }
   iamRoleStatements:
     $ref: ./resources/lambda-policy.json
   apiKeys:
@@ -82,9 +85,11 @@ functions:
   sendEmail:
     handler: listener/consumer.newOrder
     timeout: 30
+    environment:
+      SENDGRID_API_KEY: "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"
     memorySize: 128
     events:
-      - sns: ${self:provider.environment.ORDER_TOPIC}
+      - sns: ${self:custom.ORDER_TOPIC}
 
 resources:
   Resources:
