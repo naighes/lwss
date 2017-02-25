@@ -86,7 +86,7 @@ functions:
     handler: listener/consumer.newOrder
     timeout: 30
     environment:
-      SENDGRID_API_KEY: "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"
+      SENDGRID_API_KEY: "[ADD_YOUR_KEY_HERE]"
       SENDER_EMAIL: "noreply@lif-ewithou-tservers.com"
     memorySize: 128
     events:
