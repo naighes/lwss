@@ -6,9 +6,9 @@ const async = require('async')
 module.exports.newOrder = (event, context, callback) => {
     async.eachSeries(event.Records, withRecord, (error) => {
         if (error) {
-            callback(error);
+            callback(error)
         } else {
-            callback(null, 'ok');
+            callback(null, 'ok')
         }
     })
 }
@@ -57,6 +57,6 @@ Object.reduce = (source, acc, fun) => {
     return Object.keys(source).reduce((previous, key) => {
         const value = source[key]
         return fun(previous, value)
-    }, acc);
+    }, acc)
 }
 

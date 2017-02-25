@@ -1,9 +1,9 @@
-'use strict';
+'use strict'
 
 const http = require('../lib/http')
 const guid = require('../lib/guid')
-const AWS = require('aws-sdk');
-const Validator = require('jsonschema').Validator;
+const AWS = require('aws-sdk')
+const Validator = require('jsonschema').Validator
 
 const paramsForCreate = (table, id, cart, now) => {
     return {
@@ -13,7 +13,7 @@ const paramsForCreate = (table, id, cart, now) => {
             cart: cart,
             last_update: now()
         }
-    };
+    }
 }
 
 const baseUrl = (event) => {
@@ -63,7 +63,7 @@ const validateOrder = (content, onSuccess, onError) => {
         }
     }
 
-    var v = new Validator();
+    var v = new Validator()
     var result = v.validate(content, schema)
 
     if (result.errors.length > 0) {
@@ -79,7 +79,7 @@ const validateOrder = (content, onSuccess, onError) => {
 }
 
 module.exports.create = (event, context, callback) => {
-    const db = new AWS.DynamoDB.DocumentClient();
+    const db = new AWS.DynamoDB.DocumentClient()
     const id = guid.generate()
     const raisePut = (content) => {
         db.put(paramsForCreate(tableName(), id, content, now),

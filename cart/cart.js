@@ -1,8 +1,8 @@
-'use strict';
+'use strict'
 
 const http = require('../lib/http')
 const guid = require('../lib/guid')
-const AWS = require('aws-sdk');
+const AWS = require('aws-sdk')
 
 const paramsForCreate = (table, id, now) => {
     return {
@@ -12,14 +12,14 @@ const paramsForCreate = (table, id, now) => {
             last_update: now(),
             rows: { }
         }
-    };
+    }
 }
 
 const paramsForDelete = (table, id) => {
     return {
         Key: { cart_id: id },
         TableName : table
-    };
+    }
 }
 
 const paramsForAdd = (table, id, itemId, now, item) => {
@@ -86,7 +86,7 @@ const parseBody = (body, onSuccess, onError) => {
 }
 
 module.exports.create = (event, context, callback) => {
-    const db = new AWS.DynamoDB.DocumentClient();
+    const db = new AWS.DynamoDB.DocumentClient()
     const id = guid.generate()
     db.put(paramsForCreate(tableName(), id, now), (error, data) => {
         if (error) {
@@ -100,7 +100,7 @@ module.exports.create = (event, context, callback) => {
 }
 
 module.exports.delete = (event, context, callback) => {
-    const db = new AWS.DynamoDB.DocumentClient();
+    const db = new AWS.DynamoDB.DocumentClient()
     db.delete(paramsForDelete(tableName(),
         event.pathParameters.id),
         (error, data) => {
@@ -114,7 +114,7 @@ module.exports.delete = (event, context, callback) => {
 }
 
 module.exports.add = (event, context, callback) => {
-    const db = new AWS.DynamoDB.DocumentClient();
+    const db = new AWS.DynamoDB.DocumentClient()
     parseBody(event.body,
         (content) => {
             db.update(paramsForAdd(tableName(),
@@ -134,7 +134,7 @@ module.exports.add = (event, context, callback) => {
 }
 
 module.exports.remove = (event, context, callback) => {
-    const db = new AWS.DynamoDB.DocumentClient();
+    const db = new AWS.DynamoDB.DocumentClient()
     db.update(paramsForRemove(tableName(),
         event.pathParameters.id,
         event.pathParameters.item_id,
@@ -149,7 +149,7 @@ module.exports.remove = (event, context, callback) => {
 }
 
 module.exports.get = (event, context, callback) => {
-    const db = new AWS.DynamoDB.DocumentClient();
+    const db = new AWS.DynamoDB.DocumentClient()
     const handleResult = (data) => {
         if (Object.keys(data).length === 0) {
             http.reply(404)

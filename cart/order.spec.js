@@ -1,10 +1,10 @@
-'use strict';
+'use strict'
 
 const expect = require('chai').expect
 const sinon = require('sinon')
 const order = require('./order')
 const guid = require('../lib/guid')
-const AWS = require('aws-sdk-mock');
+const AWS = require('aws-sdk-mock')
 
 const stubDynamo = (method) => {
     return (error, data) => {
@@ -12,7 +12,7 @@ const stubDynamo = (method) => {
             method,
             (params, callback) => {
                 callback(error, data)
-                AWS.restore('DynamoDB.DocumentClient');
+                AWS.restore('DynamoDB.DocumentClient')
             })
     }
 }
@@ -35,14 +35,14 @@ const validBody = {
 }
 
 describe('creating an order', () => {
-    var sandbox;
+    var sandbox
     beforeEach(function () {
-        sandbox = sinon.sandbox.create();
-    });
+        sandbox = sinon.sandbox.create()
+    })
 
     afterEach(function () {
-        sandbox.restore();
-    });
+        sandbox.restore()
+    })
 
     it('when dynamodb raises an error', (done) => {
         stubPut(new Error('what a bug'), { })
@@ -76,7 +76,7 @@ describe('creating an order', () => {
         const orderId = '2'
         sandbox.stub(guid, 'generate', () => {
             return orderId
-        });
+        })
         stubPut(null, { })
         order.create({
             headers: {

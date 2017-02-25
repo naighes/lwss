@@ -1,6 +1,6 @@
-'use strict';
+'use strict'
 
-const AWS = require('aws-sdk');
+const AWS = require('aws-sdk')
 const attr = require('dynamodb-data-types').AttributeValue
 const async = require('async')
 

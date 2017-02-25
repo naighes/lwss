@@ -1,17 +1,17 @@
-'use strict';
+'use strict'
 
 const expect = require('chai').expect
 const sinon = require('sinon')
 const incoming = require('./incoming')
 const attr = require('dynamodb-data-types')
-const AWS = require('aws-sdk-mock');
+const AWS = require('aws-sdk-mock')
 
 const stubPublish = (error, data) => {
     AWS.mock('SNS',
         'publish',
         (params, callback) => {
             callback(error, data)
-            AWS.restore('SNS');
+            AWS.restore('SNS')
         })
 }
 
@@ -30,7 +30,7 @@ describe('stream is triggered', () => {
             return {
                 id: '1'
             }
-        });
+        })
         stubPublish(null, { })
         incoming.order({
             Records: [{
