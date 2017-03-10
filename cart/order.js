@@ -89,6 +89,7 @@ module.exports.create = (event, context, callback) => {
                 } else {
                     http.reply(201)
                         .location(`${baseUrl(event)}orders/${id}`)
+                        .enableCors()
                         .push(callback)
                 }
             })

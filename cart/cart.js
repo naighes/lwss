@@ -94,6 +94,7 @@ module.exports.create = (event, context, callback) => {
         } else {
             http.reply(201)
                 .location(`${baseUrl(event)}carts/${id}`)
+                .enableCors()
                 .push(callback)
         }
     })
@@ -108,6 +109,7 @@ module.exports.delete = (event, context, callback) => {
                 raiseError(error).push(callback)
             } else {
                 http.reply(204)
+                    .enableCors()
                     .push(callback)
             }
         })
@@ -126,6 +128,7 @@ module.exports.add = (event, context, callback) => {
                         raiseError(error).push(callback)
                     } else {
                         http.reply(204)
+                            .enableCors()
                             .push(callback)
                     }
                 })
@@ -143,6 +146,7 @@ module.exports.remove = (event, context, callback) => {
                 raiseError(error).push(callback)
             } else {
                 http.reply(204)
+                    .enableCors()
                     .push(callback)
             }
         })
@@ -160,6 +164,7 @@ module.exports.get = (event, context, callback) => {
                 .jsonContent({
                     rows: data.Item.rows
                 })
+                .enableCors()
                 .push(callback)
         }
     }
