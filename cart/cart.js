@@ -33,7 +33,8 @@ const paramsForAdd = (table, id, itemId, now, item) => {
             ':node' : {
                 description: item.description,
                 price: item.price,
-                quantity: item.quantity
+                quantity: item.quantity,
+                thumb_url: item.thumb_url
             }
         }
     }
