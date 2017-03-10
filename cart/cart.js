@@ -74,6 +74,7 @@ const tableName = () => {
 
 const raiseError = (error) => {
     return http.reply(500)
+        .enableCors()
         .jsonContent({ message: 'oh my...', error: error })
 }
 
@@ -134,7 +135,7 @@ module.exports.add = (event, context, callback) => {
                     }
                 })
         },
-        (error) => { http.reply(400).push(callback) })
+        (error) => { http.reply(400).enableCors().push(callback) })
 }
 
 module.exports.remove = (event, context, callback) => {
@@ -158,6 +159,7 @@ module.exports.get = (event, context, callback) => {
     const handleResult = (data) => {
         if (Object.keys(data).length === 0) {
             http.reply(404)
+                .enableCors()
                 .push(callback)
         } else {
             http.reply(200)

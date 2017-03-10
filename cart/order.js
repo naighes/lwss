@@ -31,6 +31,7 @@ const tableName = () => {
 
 const raiseError = (error) => {
     return http.reply(500)
+        .enableCors()
         .jsonContent({ message: 'oh my...', error: error })
 }
 
@@ -47,7 +48,7 @@ const validateOrder = (content, onSuccess, onError) => {
     var schema = {
         "type": "object",
         "properties": {
-            "cart_id": {
+            "id": {
                 "type": "string",
                 "required": true
             },
@@ -100,11 +101,12 @@ module.exports.create = (event, context, callback) => {
             (errors) => {
                 http.reply(422)
                     .jsonContent(errors)
+                    .enableCors()
                     .push(callback)
             })
     }
     parseBody(event.body,
         validate,
-        (error) => { http.reply(400).push(callback) })
+        (error) => { http.reply(400).enableCors().push(callback) })
 }
 

@@ -26,7 +26,7 @@ const stubGet = (error, data) => {
 }
 
 const validBody = {
-    cart_id: "1",
+    id: "1",
     email: "mario@rossi.lcl",
     rows: {
         '22': {
