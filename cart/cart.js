@@ -1,7 +1,7 @@
 'use strict'
 
 const http = require('../lib/http')
-const db = require('../lib/cart.db')
+const cart = require('../lib/cart.db')
 const guid = require('../lib/guid')
 
 const baseUrl = (event) => {
@@ -26,7 +26,7 @@ const parseBody = (body, onSuccess, onError) => {
 
 module.exports.create = (event, context, callback) => {
     const id = guid.generate()
-    db.create(id)
+    cart.create(id)
         .then(data => {
             http.reply(201)
                 .location(`${baseUrl(event)}carts/${id}`)
@@ -39,7 +39,7 @@ module.exports.create = (event, context, callback) => {
 }
 
 module.exports.delete = (event, context, callback) => {
-    db.delete(event.pathParameters.id)
+    cart.delete(event.pathParameters.id)
         .then(data => {
             http.reply(204)
                 .enableCors()
@@ -53,7 +53,7 @@ module.exports.delete = (event, context, callback) => {
 module.exports.add = (event, context, callback) => {
     parseBody(event.body,
         content => {
-            db.add(event.pathParameters.id,
+            cart.add(event.pathParameters.id,
                 event.pathParameters.item_id,
                 content)
                 .then(data => {
@@ -69,7 +69,7 @@ module.exports.add = (event, context, callback) => {
 }
 
 module.exports.remove = (event, context, callback) => {
-    db.remove(event.pathParameters.id,
+    cart.remove(event.pathParameters.id,
         event.pathParameters.item_id)
         .then(data => {
             http.reply(204)
@@ -98,7 +98,7 @@ module.exports.get = (event, context, callback) => {
         }
     }
 
-    db.get(event.pathParameters.id)
+    cart.get(event.pathParameters.id)
         .then(data => {
             handleResult(data)
         })
