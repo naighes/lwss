@@ -82,7 +82,7 @@ module.exports.remove = (event, context, callback) => {
 }
 
 module.exports.get = (event, context, callback) => {
-    const handleResult = (data) => {
+    const handleResult = data => {
         if (Object.keys(data).length === 0) {
             http.reply(404)
                 .enableCors()
@@ -90,9 +90,7 @@ module.exports.get = (event, context, callback) => {
         } else {
             http.reply(200)
                 .lastModified(new Date(data.Item.last_update))
-                .jsonContent({
-                    rows: data.Item.rows
-                })
+                .jsonContent(data)
                 .enableCors()
                 .push(callback)
         }
