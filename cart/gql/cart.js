@@ -36,13 +36,14 @@ const raiseError = error => {
 }
 
 module.exports.handle = (event, context, callback) => {
-    const onSuccess = body => {
-        graphql(schema.CartSchema, getQuery(body.query))
-            .then(result => callback(null, result))
-            .catch(error => raiseError(error).push(callback))
-    }
+    const onSuccess = body => graphql(schema.CartSchema,
+        getQuery(body.query))
+        .then(result => callback(null, result))
+        .catch(error => raiseError(error)
+            .push(callback))
     parseBody(event.body,
         onSuccess,
-        error => raiseError(error).push(callback))
+        error => raiseError(error)
+        .push(callback))
 }
 

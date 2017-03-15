@@ -43,7 +43,7 @@ const cartType = new GraphQLObjectType({
 })
 
 const queryType = new GraphQLObjectType({
-    name: 'Query',
+    name: 'Root',
     fields: () => ({
         cart: {
             type: cartType,
@@ -52,7 +52,7 @@ const queryType = new GraphQLObjectType({
                     type: new GraphQLNonNull(GraphQLString)
                 }
             },
-            resolve: (root, args, ast) => {
+            resolve: (obj, args, context) => {
                 return cart.get(args.id)
             }
         }
