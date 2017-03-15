@@ -7,7 +7,7 @@ provider:
   name: aws
   runtime: nodejs4.3
   stage: dev
-  region: us-east-1
+  region: eu-west-1
   environment:
     CART_TABLE_NAME: "cart-${self:provider.stage}"
     ORDER_TABLE_NAME: "order-${self:provider.stage}"
@@ -68,6 +68,16 @@ functions:
           method: get
           cors: true
           private: true
+  cartGQL:
+    handler: cart/gql/cart.handle
+    timeout: 10
+    memorySize: 128
+    events:
+      - http:
+          path: gql/carts/
+          method: post
+          cors: true
+          private: true
   createOrder:
     handler: cart/order.create
     timeout: 10
@@ -87,7 +97,7 @@ functions:
     timeout: 30
     environment:
       SENDGRID_API_KEY: ${env:SENDGRID_API_KEY}
-      SENDER_EMAIL: "noreply@lif-ewithou-tservers.com"
+      SENDER_EMAIL: ${env:SENDER_EMAIL}
     memorySize: 128
     events:
       - sns: ${self:custom.ORDER_TOPIC}
