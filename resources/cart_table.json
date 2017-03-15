@@ -3,12 +3,12 @@
     "Properties": {
         "TableName": "${self:provider.environment.CART_TABLE_NAME}",
         "AttributeDefinitions": [{
-            "AttributeName": "cart_id",
+            "AttributeName": "id",
             "AttributeType": "S"
         }],
         "KeySchema": [
             {
-                "AttributeName": "cart_id",
+                "AttributeName": "id",
                 "KeyType": "HASH"
             }
         ],

@@ -3,12 +3,12 @@
     "Properties": {
         "TableName": "${self:provider.environment.ORDER_TABLE_NAME}",
         "AttributeDefinitions": [{
-            "AttributeName": "order_id",
+            "AttributeName": "id",
             "AttributeType": "S"
         }],
         "KeySchema": [
             {
-                "AttributeName": "order_id",
+                "AttributeName": "id",
                 "KeyType": "HASH"
             }
         ],
