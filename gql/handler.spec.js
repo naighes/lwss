@@ -35,7 +35,7 @@ describe('retrieving a cart', () => {
                 }
             }})
         const body = {
-            query: 'query { cart(id: "1") { id, rows { price } } }'
+            query: 'query { cart(id: "1") { id, rows { id, price } } }'
         }
         const event = {
             body: JSON.stringify(body)
@@ -43,7 +43,9 @@ describe('retrieving a cart', () => {
         handler.handle(event,
             null,
             (error, result) => {
-                expect('111').to.be.equal(result.data.cart.id)
+                const body = JSON.parse(result.body)
+                expect('111').to.be.equal(body.data.cart.id)
+                expect('23').to.be.equal(body.data.cart.rows[0].id)
                 done()
             })
     })

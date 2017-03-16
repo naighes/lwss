@@ -36,13 +36,20 @@ const cartType = new GraphQLObjectType({
             type: new GraphQLNonNull(GraphQLString)
         },
         rows: {
-            type: new GraphQLList(cartRowType)
+            type: new GraphQLList(cartRowType),
+            resolve: it => Object.keys(it.rows)
+            .map(key => {
+                const item = it.rows[key]
+                item.id = key
+
+                return item
+            })
         }
     })
 })
 
 const queryType = new GraphQLObjectType({
-    name: 'Root',
+    name: 'RootQuery',
     fields: () => ({
         cart: {
             type: cartType,

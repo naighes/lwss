@@ -216,8 +216,7 @@ describe('retrieving a cart', () => {
         }, null, (error, result) => {
             expect(200).to.be.equal(result.statusCode)
             expect('1970-01-18T02:15:49.794Z').to.be.equal(result.headers['Last-Modified'])
-            const row = JSON.parse(result.body).rows[0]
-            expect('23').to.be.equal(row.id)
+            const row = JSON.parse(result.body).rows['23']
             expect('cool shoes').to.be.equal(row.description)
             expect(34.2).to.be.equal(row.price)
             done()
