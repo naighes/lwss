@@ -6,7 +6,7 @@ const order = require('./order')
 const guid = require('../lib/guid')
 const AWS = require('aws-sdk-mock')
 
-const stubDynamo = (method) => {
+const stubDynamo = method => {
     return (error, data) => {
         AWS.mock('DynamoDB.DocumentClient',
             method,
@@ -44,7 +44,7 @@ describe('creating an order', () => {
         sandbox.restore()
     })
 
-    it('when dynamodb raises an error', (done) => {
+    it('when dynamodb raises an error', done => {
         stubPut(new Error('what a bug'), { })
         order.create({
             body: JSON.stringify(validBody)
@@ -54,7 +54,7 @@ describe('creating an order', () => {
         })
     })
 
-    it('when content is not valid', (done) => {
+    it('when content is not valid', done => {
         order.create({
             body: "{"
         }, null, (error, result) => {
@@ -63,7 +63,7 @@ describe('creating an order', () => {
         })
     })
 
-    it('when validation fails', (done) => {
+    it('when validation fails', done => {
         order.create({
             body: "{}"
         }, null, (error, result) => {
@@ -72,7 +72,7 @@ describe('creating an order', () => {
         })
     })
 
-    it('happy path', (done) => {
+    it('happy path', done => {
         const orderId = '2'
         sandbox.stub(guid, 'generate', () => {
             return orderId

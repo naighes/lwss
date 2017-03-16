@@ -68,7 +68,7 @@ functions:
           method: get
           cors: true
           private: true
-  cartGQL:
+  gql:
     handler: cart/gql/cart.handle
     timeout: 10
     memorySize: 128

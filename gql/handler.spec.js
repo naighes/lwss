@@ -2,8 +2,8 @@
 
 const expect = require('chai').expect
 const sinon = require('sinon')
-const cart = require('./cart')
-const guid = require('../../lib/guid')
+const handler = require('./handler')
+const guid = require('../lib/guid')
 const AWS = require('aws-sdk-mock')
 
 const stubDynamo = (method) => {
@@ -40,7 +40,7 @@ describe('retrieving a cart', () => {
         const event = {
             body: JSON.stringify(body)
         }
-        cart.handle(event,
+        handler.handle(event,
             null,
             (error, result) => {
                 expect('111').to.be.equal(result.data.cart.id)

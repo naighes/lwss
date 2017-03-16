@@ -1,35 +1,16 @@
 'use strict'
 
 const http = require('../lib/http')
+const db = require('../lib/order.db')
 const guid = require('../lib/guid')
-const AWS = require('aws-sdk')
 const Validator = require('jsonschema').Validator
 
-const paramsForCreate = (table, id, cart, now) => {
-    return {
-        TableName : table,
-        Item: {
-            order_id: id,
-            cart: cart,
-            last_update: now()
-        }
-    }
-}
-
-const baseUrl = (event) => {
+const baseUrl = event => {
     const scheme = event.headers['X-Forwarded-Proto']
     return `${scheme}://${event.headers.Host}/${event.requestContext.stage}/`
 }
 
-const now = () => {
-    return new Date().getTime()
-}
-
-const tableName = () => {
-    return process.env.ORDER_TABLE_NAME
-}
-
-const raiseError = (error) => {
+const raiseError = error => {
     return http.reply(500)
         .enableCors()
         .jsonContent({ message: 'oh my...', error: error })
@@ -64,11 +45,10 @@ const validateOrder = (content, onSuccess, onError) => {
         }
     }
 
-    var v = new Validator()
-    var result = v.validate(content, schema)
+    const result = new Validator().validate(content, schema)
 
     if (result.errors.length > 0) {
-        onError(result.errors.map((value) => {
+        onError(result.errors.map(value => {
             return {
                 property: value.property,
                 message: value.message
@@ -80,33 +60,23 @@ const validateOrder = (content, onSuccess, onError) => {
 }
 
 module.exports.create = (event, context, callback) => {
-    const db = new AWS.DynamoDB.DocumentClient()
     const id = guid.generate()
-    const raisePut = (content) => {
-        db.put(paramsForCreate(tableName(), id, content, now),
-            (error, data) => {
-                if (error) {
-                    raiseError(error).push(callback)
-                } else {
-                    http.reply(201)
-                        .location(`${baseUrl(event)}orders/${id}`)
-                        .enableCors()
-                        .push(callback)
-                }
-            })
-    }
-    const validate = (content) => {
-        validateOrder(content,
-            raisePut,
-            (errors) => {
-                http.reply(422)
-                    .jsonContent(errors)
-                    .enableCors()
-                    .push(callback)
-            })
-    }
+    const raisePut = content => db.create(id, content)
+        .then(result => http.reply(201)
+            .location(`${baseUrl(event)}orders/${id}`)
+            .enableCors()
+            .push(callback))
+        .catch(error => raiseError(error).push(callback))
+    const validate = content => validateOrder(content,
+        raisePut,
+        errors => http.reply(422)
+        .jsonContent(errors)
+        .enableCors()
+        .push(callback))
     parseBody(event.body,
         validate,
-        (error) => { http.reply(400).enableCors().push(callback) })
+        error => http.reply(400)
+        .enableCors()
+        .push(callback))
 }
 

@@ -1,12 +1,12 @@
 'use strict'
 
-const {
-    graphql
-} = require('graphql')
-const http = require('../../lib/http')
-const cart = require('../../lib/cart.db')
-const guid = require('../../lib/guid')
-const schema = require('./cart.schema')
+const graphqlModule = require('graphql')
+const graphql = graphqlModule.graphql
+
+const http = require('../lib/http')
+const cart = require('../lib/cart.db')
+const guid = require('../lib/guid')
+const schema = require('./schema')
 
 const parseBody = (body, onSuccess, onError) => {
     try {
@@ -17,8 +17,6 @@ const parseBody = (body, onSuccess, onError) => {
     }
 }
 
-// patch to allow queries from GraphiQL
-// like the initial introspectionQuery
 const getQuery = body => {
     let q = body
 

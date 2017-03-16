@@ -1,13 +1,12 @@
-const cart = require('../../lib/cart.db')
-const {
-    GraphQLObjectType,
-    GraphQLNonNull,
-    GraphQLSchema,
-    GraphQLString,
-    GraphQLInt,
-    GraphQLFloat,
-    GraphQLList
-} = require('graphql')
+const cart = require('../lib/cart.db')
+const graphqlModule = require('graphql')
+const GraphQLObjectType = graphqlModule.GraphQLObjectType
+const GraphQLNonNull = graphqlModule.GraphQLNonNull
+const GraphQLSchema = graphqlModule.GraphQLSchema
+const GraphQLString = graphqlModule.GraphQLString
+const GraphQLInt = graphqlModule.GraphQLInt
+const GraphQLFloat = graphqlModule.GraphQLFloat
+const GraphQLList = graphqlModule.GraphQLList
 
 const cartRowType = new GraphQLObjectType({
     name: 'CartRow',

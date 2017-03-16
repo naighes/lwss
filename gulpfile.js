@@ -11,8 +11,9 @@ gulp.task("default", function(done) {
 gulp.task("test", function() {
     return gulp.src(["!node_modules",
         "!node_modules/**",
-        "./cart/*.spec.js",
         "./lib/*.spec.js",
+        "./cart/*.spec.js",
+        "./gql/*.spec.js",
         "./listener/*.spec.js"])
         .pipe(mocha({ reporter: "nyan" }));
 });
