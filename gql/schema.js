@@ -58,7 +58,7 @@ const queryType = new GraphQLObjectType({
     })
 })
 
-module.exports.CartSchema = new GraphQLSchema({
+module.exports.Schema = new GraphQLSchema({
       query: queryType,
       types: [cartType, cartRowType]
 })

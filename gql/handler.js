@@ -2,7 +2,6 @@
 
 const graphqlModule = require('graphql')
 const graphql = graphqlModule.graphql
-
 const http = require('../lib/http')
 const cart = require('../lib/cart.db')
 const guid = require('../lib/guid')
@@ -18,13 +17,11 @@ const parseBody = (body, onSuccess, onError) => {
 }
 
 const getQuery = body => {
-    let q = body
-
-    if (q && q.hasOwnProperty('query')) {
-        q = q.query.replace("\n", ' ', "g")
+    if (body && body.hasOwnProperty('query')) {
+        return body.query.replace('\n', ' ', 'g')
     }
 
-    return q
+    return body
 }
 
 const raiseError = error => {
@@ -34,9 +31,12 @@ const raiseError = error => {
 }
 
 module.exports.handle = (event, context, callback) => {
-    const onSuccess = body => graphql(schema.CartSchema,
+    const onSuccess = body => graphql(schema.Schema,
         getQuery(body.query))
-        .then(result => callback(null, result))
+        .then(result => http.reply(200)
+            .enableCors()
+            .jsonContent(result)
+            .push(callback))
         .catch(error => raiseError(error)
             .push(callback))
     parseBody(event.body,
