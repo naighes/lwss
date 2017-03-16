@@ -46,16 +46,26 @@ module.exports.delete = (event, context, callback) =>
         .then(data => raiseNoContent().push(callback))
         .catch(error => raiseError(error).push(callback))
 
-// TODO: return 201 on creation
-module.exports.add = (event, context, callback) =>
+module.exports.add = (event, context, callback) => {
+    const handleResult = data => {
+        if (typeof(data) === 'undefined' || Object.keys(data).length === 0) {
+            // TODO: add location
+            return http.reply(201)
+                .enableCors()
+                .push
+        }
+
+        return raiseNoContent().push
+    }
     parseBody(event.body,
         content => {
             content.id = event.pathParameters.item_id
             cart.add(event.pathParameters.id, content)
-                .then(data => raiseNoContent().push(callback))
+                .then(data => handleResult(data)(callback))
                 .catch(error => raiseError(error).push(callback))
         },
         error => raiseBadRequest(error).push(callback))
+}
 
 // TODO: return 404 on item not found
 module.exports.remove = (event, context, callback) =>

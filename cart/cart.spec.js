@@ -130,8 +130,25 @@ describe('adding an item', () => {
         })
     })
 
-    it('happy path', (done) => {
+    it('happy path and non existing', done => {
         stubUpdate(null, { })
+        cart.add({
+            pathParameters: {
+                id: '123-456',
+                item_id: '789'
+            },
+            body: "{ }"
+        }, null, (error, result) => {
+            expect(201).to.be.equal(result.statusCode)
+            done()
+        })
+    })
+
+    it('happy path and already existing', done => {
+        stubUpdate(null, {
+            Attributes: {
+            }
+        })
         cart.add({
             pathParameters: {
                 id: '123-456',
