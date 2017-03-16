@@ -50,14 +50,19 @@ module.exports.delete = (event, context, callback) =>
         .catch(error => raiseError(error)(callback))
 
 module.exports.add = (event, context, callback) => {
-    const handleResult = data => utils.emptyOrUndefined(data)
-        ? http.reply(201).enableCors().push // TODO: add location
-        : raiseNoContent()
+    const rowIsChanged = (data, id) =>
+        utils.notEmpty(data) &&
+        data.hasOwnProperty('Attributes') &&
+        data.Attributes.hasOwnProperty('rows') &&
+        data.Attributes.rows.hasOwnProperty(id)
+    const handleResult = (data, id) => rowIsChanged(data, id)
+        ? raiseNoContent()
+        : http.reply(201).enableCors().push // TODO: add location
     parseBody(event.body,
         content => {
             content.id = event.pathParameters.item_id
             cart.add(event.pathParameters.id, content)
-                .then(data => handleResult(data)(callback))
+                .then(data => handleResult(data, content.id)(callback))
                 .catch(error => raiseError(error)(callback))
         },
         error => raiseBadRequest(error)(callback))
@@ -71,8 +76,8 @@ module.exports.remove = (event, context, callback) =>
         .catch(error => raiseError(error)(callback))
 
 module.exports.get = (event, context, callback) => {
-    const handleResult = data => utils.emptyOrUndefined(data)
-        ? raiseNotFound
+    const handleResult = data => utils.empty(data)
+        ? raiseNotFound()
         : http.reply(200)
         .lastModified(new Date(data.last_update))
         .jsonContent(data)

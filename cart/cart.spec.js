@@ -147,6 +147,9 @@ describe('adding an item', () => {
     it('happy path and already existing', done => {
         stubUpdate(null, {
             Attributes: {
+                rows: {
+                    '789': { }
+                }
             }
         })
         cart.add({
