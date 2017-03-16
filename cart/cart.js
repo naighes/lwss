@@ -71,20 +71,15 @@ module.exports.remove = (event, context, callback) =>
         .catch(error => raiseError(error)(callback))
 
 module.exports.get = (event, context, callback) => {
-    const handleResult = data => {
-        if (Object.keys(data).length === 0) {
-            raiseNotFound()(callback)
-        } else {
-            http.reply(200)
-                .lastModified(new Date(data.last_update))
-                .jsonContent(data)
-                .enableCors()
-                .push(callback)
-        }
-    }
-
+    const handleResult = data => utils.emptyOrUndefined(data)
+        ? raiseNotFound
+        : http.reply(200)
+        .lastModified(new Date(data.last_update))
+        .jsonContent(data)
+        .enableCors()
+        .push
     cart.get(event.pathParameters.id)
-        .then(data => handleResult(data))
+        .then(data => handleResult(data)(callback))
         .catch(error => raiseError(error)(callback))
 }
 
