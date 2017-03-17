@@ -50,12 +50,7 @@ module.exports.delete = (event, context, callback) =>
         .catch(error => raiseError(error)(callback))
 
 module.exports.add = (event, context, callback) => {
-    const rowIsChanged = (data, id) =>
-        utils.notEmpty(data) &&
-        data.hasOwnProperty('Attributes') &&
-        data.Attributes.hasOwnProperty('rows') &&
-        data.Attributes.rows.hasOwnProperty(id)
-    const handleResult = (data, id) => rowIsChanged(data, id)
+    const handleResult = data => data.oldRow
         ? raiseNoContent()
         : http.reply(201).enableCors().push // TODO: add location
     parseBody(event.body,
