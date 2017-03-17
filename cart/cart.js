@@ -55,7 +55,7 @@ module.exports.delete = (event, context, callback) => {
 module.exports.add = (event, context, callback) => {
     const handleResult = data => data._old
         ? raiseNoContent()
-        : http.reply(201).enableCors().push // TODO: add location
+        : http.reply(201).enableCors().push
     parseBody(event.body,
         content => {
             content.id = event.pathParameters.item_id
