@@ -266,6 +266,8 @@ describe('retrieving a cart', () => {
                 }
             }})
         cart.get({
+            headers: {
+            },
             pathParameters: {
                 id: '123-456'
             }
@@ -273,8 +275,33 @@ describe('retrieving a cart', () => {
             expect(200).to.be.equal(result.statusCode)
             expect('1970-01-18T02:15:49.794Z').to.be.equal(result.headers['Last-Modified'])
             const row = JSON.parse(result.body).rows['23']
-            expect('cool shoes').to.be.equal(row.description)
             expect(34.2).to.be.equal(row.price)
+            expect('cool shoes').to.be.equal(row.description)
+            done()
+        })
+    })
+
+    it('not modified', done => {
+        const last_update = 1476949794
+        stubGet(null, {
+            Item: {
+                last_update: last_update,
+                rows: {
+                    '23': {
+                        description: 'cool shoes',
+                        price: 34.2
+                    }
+                }
+            }})
+        cart.get({
+            headers: {
+                'If-None-Match': 'W/"U3VuIEphbiAxOCAxOTcwIDAzOjE1OjQ5IEdNVCswMTAwIChDRVQp"'
+            },
+            pathParameters: {
+                id: '123-456'
+            }
+        }, null, (error, result) => {
+            expect(304).to.be.equal(result.statusCode)
             done()
         })
     })
