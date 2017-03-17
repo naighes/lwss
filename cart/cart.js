@@ -81,6 +81,7 @@ module.exports.get = (event, context, callback) => {
         ? raiseNotFound()
         : http.reply(200)
         .lastModified(new Date(data.last_update))
+        .etag(new Date(data.last_update).toString())
         .jsonContent(data)
         .enableCors()
         .push
