@@ -43,14 +43,17 @@ module.exports.create = (event, context, callback) => {
         .catch(error => raiseError(error)(callback))
 }
 
-// TODO: return 404 on item not found
-module.exports.delete = (event, context, callback) =>
+module.exports.delete = (event, context, callback) => {
+    const handleResult = data => data._old
+        ? raiseNoContent()
+        : raiseNotFound()
     cart.delete(event.pathParameters.id)
-        .then(data => raiseNoContent()(callback))
+        .then(data => handleResult(data)(callback))
         .catch(error => raiseError(error)(callback))
+}
 
 module.exports.add = (event, context, callback) => {
-    const handleResult = data => data.oldRow
+    const handleResult = data => data._old
         ? raiseNoContent()
         : http.reply(201).enableCors().push // TODO: add location
     parseBody(event.body,

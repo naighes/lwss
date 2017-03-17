@@ -6,7 +6,7 @@ const cart = require('./cart')
 const guid = require('../lib/guid')
 const AWS = require('aws-sdk-mock')
 
-const stubDynamo = (method) => {
+const stubDynamo = method => {
     return (error, data) => {
         AWS.mock('DynamoDB.DocumentClient',
             method,
@@ -43,7 +43,7 @@ describe('creating a cart', () => {
         sandbox.restore()
     })
 
-    it('when dynamodb raises an error', (done) => {
+    it('when dynamodb raises an error', done => {
         stubPut(new Error('what a bug'), { })
         cart.create({
             body: "{}"
@@ -53,7 +53,7 @@ describe('creating a cart', () => {
         })
     })
 
-    it('happy path', (done) => {
+    it('happy path', done => {
         const cartId = '2'
         sandbox.stub(guid, 'generate', () => {
             return cartId
@@ -77,7 +77,7 @@ describe('creating a cart', () => {
 })
 
 describe('deleting a cart', () => {
-    it('when dynamodb raises an error', (done) => {
+    it('when dynamodb raises an error', done => {
         stubDelete(new Error('what a bug'), { })
         cart.delete({
             pathParameters: {
@@ -89,8 +89,24 @@ describe('deleting a cart', () => {
         })
     })
 
-    it('happy path', (done) => {
+    it('happy path and non existing', done => {
         stubDelete(null, { })
+        cart.delete({
+            pathParameters: {
+                id: '2'
+            }
+        }, null, (error, result) => {
+            expect(404).to.be.equal(result.statusCode)
+            done()
+        })
+    })
+
+    it('happy path and existing', done => {
+        stubDelete(null, {
+            Attributes: {
+                id: '2'
+            }
+        })
         cart.delete({
             pathParameters: {
                 id: '2'
@@ -117,7 +133,7 @@ describe('adding an item', () => {
         })
     })
 
-    it('when content is invalid', (done) => {
+    it('when content is invalid', done => {
         cart.add({
             pathParameters: {
                 id: '123-456',
@@ -166,7 +182,7 @@ describe('adding an item', () => {
 })
 
 describe('removing an item', () => {
-    it('when dynamodb raises an error', (done) => {
+    it('when dynamodb raises an error', done => {
         stubUpdate(new Error('what a bug'), { })
         cart.remove({
             pathParameters: {
@@ -179,7 +195,7 @@ describe('removing an item', () => {
         })
     })
 
-    it('happy path', (done) => {
+    it('happy path', done => {
         stubUpdate(null, { })
         cart.remove({
             pathParameters: {
@@ -194,7 +210,7 @@ describe('removing an item', () => {
 })
 
 describe('retrieving a cart', () => {
-    it('when dynamodb raises an error', (done) => {
+    it('when dynamodb raises an error', done => {
         stubGet(new Error('what a bug'), { })
         cart.get({
             pathParameters: {
@@ -206,7 +222,7 @@ describe('retrieving a cart', () => {
         })
     })
 
-    it('when dynamodb returns empty', (done) => {
+    it('when dynamodb returns empty', done => {
         stubGet(null, { })
         cart.get({
             pathParameters: {
@@ -218,7 +234,7 @@ describe('retrieving a cart', () => {
         })
     })
 
-    it('happy path', (done) => {
+    it('happy path', done => {
         stubGet(null, {
             Item: {
                 last_update: 1476949794,
