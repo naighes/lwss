@@ -66,12 +66,15 @@ module.exports.add = (event, context, callback) => {
         error => raiseBadRequest(error)(callback))
 }
 
-// TODO: return 404 on item not found
-module.exports.remove = (event, context, callback) =>
+module.exports.remove = (event, context, callback) => {
+    const handleResult = data => data._old
+        ? raiseNoContent()
+        : raiseNotFound()
     cart.remove(event.pathParameters.id,
         event.pathParameters.item_id)
-        .then(data => raiseNoContent()(callback))
+        .then(data => handleResult(data)(callback))
         .catch(error => raiseError(error)(callback))
+}
 
 module.exports.get = (event, context, callback) => {
     const handleResult = data => utils.empty(data)

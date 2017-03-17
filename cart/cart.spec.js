@@ -195,8 +195,28 @@ describe('removing an item', () => {
         })
     })
 
-    it('happy path', done => {
+    it('happy path and non existing', done => {
         stubUpdate(null, { })
+        cart.remove({
+            pathParameters: {
+                id: '123-456',
+                item_id: '789'
+            }
+        }, null, (error, result) => {
+            expect(404).to.be.equal(result.statusCode)
+            done()
+        })
+    })
+
+    it('happy path and existing', done => {
+        stubUpdate(null, {
+            Attributes: {
+                rows: {
+                    '789': {
+                    }
+                }
+            }
+        })
         cart.remove({
             pathParameters: {
                 id: '123-456',
