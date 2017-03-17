@@ -77,23 +77,19 @@ module.exports.remove = (event, context, callback) => {
 }
 
 module.exports.get = (event, context, callback) => {
-    const handleOk = (headers, etag) => http.inspect()
-        .ifNoneMatch(headers, etag)(data =>
-            http.reply(304)
-            .lastModified(new Date(data.last_update))
-            .etag(new Date(data.last_update).toString())
-            .enableCors(),
-            data => http.reply(200)
+    const reply = (statusCode, data) =>
+        http.reply(statusCode)
             .lastModified(new Date(data.last_update))
             .etag(new Date(data.last_update).toString())
             .enableCors()
-            .jsonContent(data))
-    const handleResult = (data, headers) => {
-        return utils.empty(data)
+    const handleOk = (headers, etag) => http.inspect()
+        .ifNoneMatch(headers, etag)(data => reply(304, data),
+            data => reply(200, data).jsonContent(data))
+    const handleResult = (data, headers) =>
+        utils.empty(data)
             ? raiseNotFound()
             : handleOk(headers,
                 http.computeEtag(new Date(data.last_update).toString()))(data).push
-    }
     cart.get(event.pathParameters.id)
         .then(data => handleResult(data, event.headers)(callback))
         .catch(error => raiseError(error)(callback))
