@@ -281,17 +281,11 @@ describe('retrieving a cart', () => {
         })
     })
 
-    it('not modified', done => {
+    it('If-None-Match', done => {
         const last_update = 1476949794
         stubGet(null, {
             Item: {
-                last_update: last_update,
-                rows: {
-                    '23': {
-                        description: 'cool shoes',
-                        price: 34.2
-                    }
-                }
+                last_update: last_update
             }})
         cart.get({
             headers: {
@@ -302,6 +296,25 @@ describe('retrieving a cart', () => {
             }
         }, null, (error, result) => {
             expect(304).to.be.equal(result.statusCode)
+            done()
+        })
+    })
+
+    it('If-None-Match', done => {
+        const last_update = 1476949794
+        stubGet(null, {
+            Item: {
+                last_update: last_update
+            }})
+        cart.get({
+            headers: {
+                'If-Match': 'W/"U3VuIEphbiAxOCAxOTcwIDAzOjE1OjQ5IEdNVCswMTAwIChDRVQp"'
+            },
+            pathParameters: {
+                id: '123-456'
+            }
+        }, null, (error, result) => {
+            expect(200).to.be.equal(result.statusCode)
             done()
         })
     })

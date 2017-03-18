@@ -1,6 +1,7 @@
 'use strict'
 
 const http = require('../lib/http')
+const inspect = http.inspect()
 const cart = require('../lib/cart.db')
 const guid = require('../lib/guid')
 const utils = require('../lib/utils')
@@ -82,14 +83,13 @@ module.exports.get = (event, context, callback) => {
             .lastModified(new Date(data.last_update))
             .etag(new Date(data.last_update).toString())
             .enableCors()
-    const handleOk = (headers, etag) => http.inspect()
-        .ifNoneMatch(headers, etag)(data => reply(304, data),
-            data => reply(200, data).jsonContent(data))
     const handleResult = (data, headers) =>
         utils.empty(data)
             ? raiseNotFound()
-            : handleOk(headers,
-                http.computeEtag(new Date(data.last_update).toString()))(data).push
+            : inspect.handleConditionalRequest(headers,
+                http.computeEtag(new Date(data.last_update).toString()))(
+                    data => reply(304, data),
+                    data => reply(200, data).jsonContent(data))(data).push
     cart.get(event.pathParameters.id)
         .then(data => handleResult(data, event.headers)(callback))
         .catch(error => raiseError(error)(callback))
