@@ -10,11 +10,9 @@ const baseUrl = event => {
     return `${scheme}://${event.headers.Host}/${event.requestContext.stage}/`
 }
 
-const raiseError = error => {
-    return http.reply(500)
-        .enableCors()
-        .jsonContent({ message: 'oh my...', error: error })
-}
+const raiseError = error => http.reply(500)
+    .enableCors()
+    .jsonContent({ message: 'oh my...', error: error })
 
 const parseBody = (body, onSuccess, onError) => {
     try {

@@ -53,6 +53,7 @@ module.exports.delete = (event, context, callback) => {
         .catch(error => raiseError(error)(callback))
 }
 
+// TODO: handle optimistic concurrency by conditional request
 module.exports.add = (event, context, callback) => {
     const handleResult = data => data._old
         ? raiseNoContent()
@@ -87,7 +88,8 @@ module.exports.get = (event, context, callback) => {
         utils.empty(data)
             ? raiseNotFound()
             : inspect.handleConditionalRequest(headers,
-                http.computeEtag(new Date(data.last_update).toString()))(
+                http.computeEtag(new Date(data.last_update).toString()),
+                new Date(data.last_update))(
                     data => reply(304, data),
                     data => reply(200, data).jsonContent(data))(data).push
     cart.get(event.pathParameters.id)
