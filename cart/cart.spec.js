@@ -356,5 +356,43 @@ describe('retrieving a cart', () => {
             done()
         })
     })
+
+    it('If-Modified-Since (modified)', done => {
+        const last_update = 1476949794
+        stubGet(null, {
+            Item: {
+                last_update: last_update
+            }})
+        cart.get({
+            headers: {
+                'If-Modified-Since': '1970-01-18T02:15:48.794Z'
+            },
+            pathParameters: {
+                id: '123-456'
+            }
+        }, null, (error, result) => {
+            expect(304).to.be.equal(result.statusCode)
+            done()
+        })
+    })
+
+    it('If-Modified-Since (not modified)', done => {
+        const last_update = 1476949794
+        stubGet(null, {
+            Item: {
+                last_update: last_update
+            }})
+        cart.get({
+            headers: {
+                'If-Modified-Since': '1970-01-18T02:15:50.794Z'
+            },
+            pathParameters: {
+                id: '123-456'
+            }
+        }, null, (error, result) => {
+            expect(200).to.be.equal(result.statusCode)
+            done()
+        })
+    })
 })
 
