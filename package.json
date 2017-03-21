@@ -7,7 +7,9 @@
     "aws-sdk": "^2.16.0",
     "dynamodb-data-types": "^3.0.0",
     "graphql": "^0.9.1",
+    "jshint": "^2.9.4",
     "jsonschema": "^1.1.1",
+    "moment": "^2.18.0",
     "sendgrid": "^4.7.1"
   },
   "devDependencies": {

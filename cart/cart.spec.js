@@ -109,6 +109,7 @@ describe('adding an item', () => {
         stubUpdate(new Error('what a bug'), { })
         cart.add({
             pathParameters: { id: '123-456', item_id: '789' },
+            headers: { 'If-Unmodified-Since': '1970-01-18T02:15:48.794Z' },
             body: "{ }"
         }, null, (error, result) => {
             expect(500).to.be.equal(result.statusCode)
@@ -119,6 +120,7 @@ describe('adding an item', () => {
     it('when content is invalid', done => {
         cart.add({
             pathParameters: { id: '123-456', item_id: '789' },
+            headers: { 'If-Unmodified-Since': '1970-01-18T02:15:48.794Z' },
             body: "{"
         }, null, (error, result) => {
             expect(400).to.be.equal(result.statusCode)
@@ -127,9 +129,12 @@ describe('adding an item', () => {
     })
 
     it('happy path and non existing', done => {
-        stubUpdate(null, { })
+        stubUpdate(null, {
+            Attributes: { last_update: 1476949794 }
+        })
         cart.add({
             pathParameters: { id: '123-456', item_id: '789' },
+            headers: { 'If-Unmodified-Since': '1970-01-18T02:15:48.794Z' },
             body: "{ }"
         }, null, (error, result) => {
             expect(201).to.be.equal(result.statusCode)
@@ -140,6 +145,7 @@ describe('adding an item', () => {
     it('happy path and already existing', done => {
         stubUpdate(null, {
             Attributes: {
+                last_update: 1476949794,
                 rows: {
                     '789': { }
                 }
@@ -147,9 +153,36 @@ describe('adding an item', () => {
         })
         cart.add({
             pathParameters: { id: '123-456', item_id: '789' },
+            headers: { 'If-Unmodified-Since': '1970-01-18T02:15:48.794Z' },
             body: "{ }"
         }, null, (error, result) => {
             expect(204).to.be.equal(result.statusCode)
+            done()
+        })
+    })
+
+    it('missing "If-Unmodified-Since"', done => {
+        stubUpdate(null, { })
+        cart.add({
+            pathParameters: { id: '123-456', item_id: '789' },
+            headers: { },
+            body: "{ }"
+        }, null, (error, result) => {
+            expect(403).to.be.equal(result.statusCode)
+            done()
+        })
+    })
+
+    it('last_update is missing', done => {
+        stubUpdate(null, {
+            Attributes: { }
+        })
+        cart.add({
+            pathParameters: { id: '123-456', item_id: '789' },
+            headers: { 'If-Unmodified-Since': '1970-01-18T02:15:48.794Z' },
+            body: "{ }"
+        }, null, (error, result) => {
+            expect(412).to.be.equal(result.statusCode)
             done()
         })
     })
@@ -230,7 +263,7 @@ describe('retrieving a cart', () => {
             pathParameters: { id: '123-456' }
         }, null, (error, result) => {
             expect(200).to.be.equal(result.statusCode)
-            expect('1970-01-18T02:15:49.794Z').to.be.equal(result.headers['Last-Modified'])
+            expect('Sun, 18 Jan 1970 02:15:49 UTC').to.be.equal(result.headers['Last-Modified'])
             const row = JSON.parse(result.body).rows['23']
             expect(34.2).to.be.equal(row.price)
             expect('cool shoes').to.be.equal(row.description)
@@ -274,7 +307,7 @@ describe('conditional requests', () => {
             Item: { last_update: last_update }
         })
         cart.get({
-            headers: { 'If-Unmodified-Since': '1970-01-18T02:15:48.794Z' },
+            headers: { 'If-Unmodified-Since': 'Sun, 18 Jan 1970 02:15:48 UTC' },
             pathParameters: { id: '123-456' }
         }, null, (error, result) => {
             expect(200).to.be.equal(result.statusCode)
@@ -288,7 +321,7 @@ describe('conditional requests', () => {
             Item: { last_update: last_update }
         })
         cart.get({
-            headers: { 'If-Unmodified-Since': '1970-01-18T02:15:50.794Z' },
+            headers: { 'If-Unmodified-Since': 'Sun, 18 Jan 1970 02:15:50 UTC' },
             pathParameters: { id: '123-456' }
         }, null, (error, result) => {
             expect(304).to.be.equal(result.statusCode)
@@ -301,7 +334,7 @@ describe('conditional requests', () => {
         stubGet(null, {
             Item: { last_update: last_update }})
         cart.get({
-            headers: { 'If-Modified-Since': '1970-01-18T02:15:48.794Z' },
+            headers: { 'If-Modified-Since': 'Sun, 18 Jan 1970 02:15:48 UTC' },
             pathParameters: { id: '123-456' }
         }, null, (error, result) => {
             expect(304).to.be.equal(result.statusCode)
@@ -315,7 +348,7 @@ describe('conditional requests', () => {
             Item: { last_update: last_update }
         })
         cart.get({
-            headers: { 'If-Modified-Since': '1970-01-18T02:15:50.794Z' },
+            headers: { 'If-Modified-Since': 'Sun, 18 Jan 1970 02:15:50 UTC' },
             pathParameters: { id: '123-456' }
         }, null, (error, result) => {
             expect(200).to.be.equal(result.statusCode)

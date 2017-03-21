@@ -55,17 +55,30 @@ module.exports.delete = (event, context, callback) => {
 
 // TODO: handle optimistic concurrency by conditional request
 module.exports.add = (event, context, callback) => {
-    const handleResult = data => data._old
-        ? raiseNoContent()
-        : http.reply(201).enableCors().push
-    parseBody(event.body,
-        content => {
-            content.id = event.pathParameters.item_id
-            cart.add(event.pathParameters.id, content)
-                .then(data => handleResult(data, content.id)(callback))
-                .catch(error => raiseError(error)(callback))
-        },
-        error => raiseBadRequest(error)(callback))
+    const validate = (headers, ok, ko) => inspect.ifUnmodifiedSince(headers) ? ok() : ko()
+    const raiseForbidden = http.reply(403)
+        .enableCors()
+        .jsonContent({ message: 'you need to provide "If-Modified-Since" in order to update' })
+        .push
+    const raisePreconditionFailed = () => http.reply(412)
+        .enableCors()
+        .jsonContent({ message: 'optimistic concurrency violation occurred' })
+        .push
+    const handleResult = data => data._new
+        ? (data._old ? raiseNoContent() : http.reply(201).enableCors().push)
+        : raisePreconditionFailed()
+    validate(event.headers,
+        () => parseBody(event.body,
+            content => {
+                content.id = event.pathParameters.item_id
+                cart.add(event.pathParameters.id,
+                    inspect.ifUnmodifiedSince(event.headers),
+                    content)
+                    .then(data => handleResult(data, content.id)(callback))
+                    .catch(error => raiseError(error)(callback))
+            },
+            error => raiseBadRequest(error)(callback)),
+        () => raiseForbidden(callback))
 }
 
 module.exports.remove = (event, context, callback) => {
@@ -79,16 +92,17 @@ module.exports.remove = (event, context, callback) => {
 }
 
 module.exports.get = (event, context, callback) => {
+    const etag = lastUpdate => http.computeEtag(new Date(lastUpdate).toString())
     const reply = (statusCode, data) =>
         http.reply(statusCode)
             .lastModified(new Date(data.last_update))
-            .etag(new Date(data.last_update).toString())
+            .etag(etag(data.last_update))
             .enableCors()
     const handleResult = (data, headers) =>
         utils.empty(data)
             ? raiseNotFound()
             : inspect.handleConditionalRequest(headers,
-                http.computeEtag(new Date(data.last_update).toString()),
+                etag(data.last_update),
                 new Date(data.last_update))(
                     data => reply(304, data),
                     data => reply(200, data).jsonContent(data))(data).push
