@@ -16,23 +16,23 @@ const raiseError = error => http.reply(500)
     .jsonContent({ message: 'oh my...', error: error })
     .push
 
-const raiseBadRequest = error => http.reply(400)
+const raiseBadRequest = (error, ctx) => http.reply(400)
     .enableCors()
     .jsonContent({ error: error })
-    .push
+    .push(ctx.callback)
 
 const raiseNoContent = () => http.reply(204).enableCors().push
 
 const raiseNotFound = () => http.reply(404).enableCors().push
 
-const parseBody = body => {
+const parseBody = ctx => {
     return {
         then: (ok, ko) => {
             try {
-                const json = JSON.parse(body)
-                ok(json)
+                const json = JSON.parse(ctx.event.body)
+                return ok(json, ctx)
             } catch (e) {
-                ko(e)
+                return ko(e, ctx)
             }
         }
     }
@@ -59,30 +59,41 @@ module.exports.delete = (event, context, callback) => {
 
 // TODO: handle optimistic concurrency by conditional request
 module.exports.add = (event, context, callback) => {
-    const validate = (headers, ok, ko) => inspect.ifUnmodifiedSince(headers) ? ok() : ko()
-    const raiseForbidden = http.reply(403)
+    const ctx = {
+        event: event,
+        callback: callback
+    }
+    const id = event.pathParameters.item_id
+    const validate = ctx => {
+        return {
+            then: (ok, ko) => inspect.ifUnmodifiedSince(ctx.event.headers)
+            ? ok(ctx)
+            : ko(ctx)
+        }
+    }
+    const raiseForbidden = ctx => http.reply(403)
         .enableCors()
         .jsonContent({ message: 'you need to provide "If-Modified-Since" in order to update' })
-        .push
+        .push(ctx.callback)
     const raisePreconditionFailed = () => http.reply(412)
         .enableCors()
         .jsonContent({ message: 'optimistic concurrency violation occurred' })
         .push
-    const handleResult = data => data._new
+    const handleResult = (data, ctx) => data._new
         ? (data._old ? raiseNoContent() : http.reply(201).enableCors().push)
         : raisePreconditionFailed()
-    validate(event.headers,
-        () => parseBody(event.body)
-        .then(content => {
-            content.id = event.pathParameters.item_id
-            cart.add(event.pathParameters.id,
-                inspect.ifUnmodifiedSince(event.headers),
-                content)
-                .then(data => handleResult(data, content.id)(callback))
-                .catch(error => raiseError(error)(callback))
-        },
-            error => raiseBadRequest(error)(callback)),
-        () => raiseForbidden(callback))
+    const add = (content, ctx) => {
+        content.id = ctx.event.pathParameters.item_id
+        return cart.add(ctx.event.pathParameters.item_id,
+            inspect.ifUnmodifiedSince(ctx.event.headers),
+            content)
+            .then(data => handleResult(data, ctx))
+            .catch(error => raiseError(error, ctx))
+    }
+    validate(ctx).then(ctx => parseBody(ctx)
+        .then((content, ctx) => add(content, ctx).then(result => result(ctx.callback)),
+            raiseBadRequest),
+        raiseForbidden)
 }
 
 module.exports.remove = (event, context, callback) => {
