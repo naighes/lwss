@@ -109,7 +109,7 @@ describe('adding an item', () => {
         stubUpdate(new Error('what a bug'), { })
         cart.add({
             pathParameters: { id: '123-456', item_id: '789' },
-            headers: { 'If-Unmodified-Since': '1970-01-18T02:15:48.794Z' },
+            headers: { 'If-Unmodified-Since': 'Sun, 18 Jan 1970 02:15:48 UTC' },
             body: "{ }"
         }, null, (error, result) => {
             expect(500).to.be.equal(result.statusCode)
@@ -120,7 +120,7 @@ describe('adding an item', () => {
     it('when content is invalid', done => {
         cart.add({
             pathParameters: { id: '123-456', item_id: '789' },
-            headers: { 'If-Unmodified-Since': '1970-01-18T02:15:48.794Z' },
+            headers: { 'If-Unmodified-Since': 'Sun, 18 Jan 1970 02:15:48 UTC' },
             body: "{"
         }, null, (error, result) => {
             expect(400).to.be.equal(result.statusCode)
@@ -134,7 +134,7 @@ describe('adding an item', () => {
         })
         cart.add({
             pathParameters: { id: '123-456', item_id: '789' },
-            headers: { 'If-Unmodified-Since': '1970-01-18T02:15:48.794Z' },
+            headers: { 'If-Unmodified-Since': 'Sun, 18 Jan 1970 02:15:48 UTC' },
             body: "{ }"
         }, null, (error, result) => {
             expect(201).to.be.equal(result.statusCode)
@@ -153,7 +153,7 @@ describe('adding an item', () => {
         })
         cart.add({
             pathParameters: { id: '123-456', item_id: '789' },
-            headers: { 'If-Unmodified-Since': '1970-01-18T02:15:48.794Z' },
+            headers: { 'If-Unmodified-Since': 'Sun, 18 Jan 1970 02:15:48 UTC' },
             body: "{ }"
         }, null, (error, result) => {
             expect(204).to.be.equal(result.statusCode)
@@ -179,7 +179,7 @@ describe('adding an item', () => {
         })
         cart.add({
             pathParameters: { id: '123-456', item_id: '789' },
-            headers: { 'If-Unmodified-Since': '1970-01-18T02:15:48.794Z' },
+            headers: { 'If-Unmodified-Since': 'Sun, 18 Jan 1970 02:15:48 UTC' },
             body: "{ }"
         }, null, (error, result) => {
             expect(412).to.be.equal(result.statusCode)
