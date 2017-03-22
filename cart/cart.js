@@ -25,12 +25,16 @@ const raiseNoContent = () => http.reply(204).enableCors().push
 
 const raiseNotFound = () => http.reply(404).enableCors().push
 
-const parseBody = (body, onSuccess, onError) => {
-    try {
-        const json = JSON.parse(body)
-        onSuccess(json)
-    } catch (e) {
-        onError(e)
+const parseBody = body => {
+    return {
+        then: (ok, ko) => {
+            try {
+                const json = JSON.parse(body)
+                ok(json)
+            } catch (e) {
+                ko(e)
+            }
+        }
     }
 }
 
@@ -68,15 +72,15 @@ module.exports.add = (event, context, callback) => {
         ? (data._old ? raiseNoContent() : http.reply(201).enableCors().push)
         : raisePreconditionFailed()
     validate(event.headers,
-        () => parseBody(event.body,
-            content => {
-                content.id = event.pathParameters.item_id
-                cart.add(event.pathParameters.id,
-                    inspect.ifUnmodifiedSince(event.headers),
-                    content)
-                    .then(data => handleResult(data, content.id)(callback))
-                    .catch(error => raiseError(error)(callback))
-            },
+        () => parseBody(event.body)
+        .then(content => {
+            content.id = event.pathParameters.item_id
+            cart.add(event.pathParameters.id,
+                inspect.ifUnmodifiedSince(event.headers),
+                content)
+                .then(data => handleResult(data, content.id)(callback))
+                .catch(error => raiseError(error)(callback))
+        },
             error => raiseBadRequest(error)(callback)),
         () => raiseForbidden(callback))
 }
