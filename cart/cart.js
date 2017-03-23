@@ -99,7 +99,7 @@ module.exports.add = (event, context, callback) => {
         : raisePreconditionFailed(ctx)
     const add = (content, ctx) => {
         content.id = ctx.event.pathParameters.item_id
-        return cart.add(ctx.event.pathParameters.item_id,
+        return cart.add(ctx.event.pathParameters.id,
             inspect.ifUnmodifiedSince(ctx.event.headers),
             content)
             .then(data => handleResult(data, ctx))
