@@ -100,7 +100,7 @@ module.exports.add = (event, context, callback) => {
     const add = (content, ctx) => {
         content.id = ctx.event.pathParameters.item_id
         return cart.add(ctx.event.pathParameters.item_id,
-            inspect.ifUnmodifiedSince(ctx.event.headers).unix(),
+            inspect.ifUnmodifiedSince(ctx.event.headers),
             content)
             .then(data => handleResult(data, ctx))
             .catch(error => raiseError(error, ctx))
@@ -132,7 +132,7 @@ module.exports.get = (event, context, callback) => {
     const etag = lastUpdate => http.computeEtag(new Date(lastUpdate).toString())
     const reply = (statusCode, data) =>
         http.reply(statusCode)
-            .lastModified(new Date(data.last_update))
+            .lastModified(data.last_update)
             .etag(etag(data.last_update))
             .enableCors()
     const handleResult = (data, ctx) =>
@@ -140,7 +140,7 @@ module.exports.get = (event, context, callback) => {
             ? raiseNotFound(ctx)
             : inspect.handleConditionalRequest(ctx.event.headers,
                 etag(data.last_update),
-                new Date(data.last_update))(
+                data.last_update)(
                     data => reply(304, data).push(ctx.callback),
                     data => reply(200, data).jsonContent(data).push(ctx.callback))(data)
     cart.get(event.pathParameters.id)
